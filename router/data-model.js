@@ -1,0 +1,42 @@
+const db = require('../data/dbConfig');
+
+function getUsers() {
+  return db("users")
+}
+function getGoogleUser(id) {
+  return db("users").where({"google_id":id})
+}
+function getInfo(id){
+    return db("users").where({"id":id})
+}
+
+function updateInfo(data) {
+  return db("users").where({id:data.id}).update(data)
+   
+}
+function register(user){
+  return db("users").insert(user)
+  }
+  function login(user)
+ { 
+     return db("users").where({"email":user.email})
+ }
+ function loginGoogle(id){
+  return db("users").where({"google_id":id})
+}
+function getOrders(order){
+  return db("orders").where({"user_id":order})
+}
+function deleteOrder(id){
+  return db("orders").delete({"id":id})
+}
+module.exports = {
+  
+    register,
+    login,
+    getUsers,
+    getGoogleUser,
+    loginGoogle
+}
+
+

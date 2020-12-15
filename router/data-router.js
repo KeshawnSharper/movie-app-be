@@ -42,7 +42,7 @@ router.post('/loginGoogle/:id', (req, res) => {
     }
     const token = jwt.sign(payload,"secret",options)
     if (user)
-    {res.status(200).json({googlegggoo_id:user.google_id,email:user.google_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name})}
+    {res.status(200).json({google_id:user.google_id,email:user.google_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name,user_name:user.user_name})}
    else {
      res.status(404).json({message:`invalid creditinials`})
    }
@@ -67,7 +67,7 @@ router.post('/loginFacebook/:id', (req, res) => {
     }
     const token = jwt.sign(payload,"secret",options)
     if (user)
-    {res.status(200).json({facebook_id:user.facebook_id,facebook_email:user.facebook_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name})}
+    {res.status(200).json({facebook_id:user.facebook_id,facebook_email:user.facebook_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name,user_name:user.user_name})}
    else {
      res.status(404).json({message:`invalid creditinials`})
    }
@@ -94,7 +94,7 @@ router.post('/login', (req, res) => {
     }
     const token = jwt.sign(payload,"secret",options)
     if (user && bcrypt.compareSync(body.password,user.password))
-    {res.status(200).json({email:body.email,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name})}
+    {res.status(200).json({email:body.email,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name,user_name:user.user_name})}
    else {
      res.status(404).json({message:`invalid creditinials`})
    }
@@ -104,6 +104,26 @@ router.post('/login', (req, res) => {
     console.log(err)
   });
 });
+router.post('/saveMovies', (req, res) => {
+  let body = req.body
+  console.log(body)
+  data.saveMovie(body)
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
+router.get('/savedMovies/:id', (req, res) => {
+  data.getMovies(req.params.id )
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
 router.get('/googleuser/:id', (req, res) => {
   data.getGoogleUser(req.params.id)
 .then(data => {

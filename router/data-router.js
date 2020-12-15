@@ -124,6 +124,15 @@ router.get('/savedMovies/:id', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
+router.delete('/deleteMovie/:id', (req, res) => {
+  data.deleteMovie(req.params.id)
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
 router.get('/googleuser/:id', (req, res) => {
   data.getGoogleUser(req.params.id)
 .then(data => {
@@ -144,6 +153,26 @@ router.get('/facebookuser/:id', (req, res) => {
 })
 router.get('/users', (req, res) => {
   data.getUsers()
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
+router.get('/users/:id', (req, res) => {
+  data.getUser(req.params.id)
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
+router.put('/users', (req, res) => {
+  let body = req.body
+  console.log(body)
+  data.edit(body)
 .then(data => {
   res.status(200).json(data);
 })

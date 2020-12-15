@@ -34,14 +34,19 @@ function loginFacebook(id){
 function getOrders(order){
   return db("orders").where({"user_id":order})
 }
-function deleteOrder(id){
-  return db("orders").delete({"id":id})
+function deleteMovie(id){
+  return db("fav_movies").where({"id":id}).delete()
+}
+function edit(user){
+  return db("users").where({"id":user.id}).update(user)
 }
 function saveMovie(movie){
   return db("fav_movies").insert(movie)
 }
 function getMovies(id){
   return db("fav_movies").where({"user_id":id})
+}function getUser(id){
+  return db("users").where({"id":id})
 }
 module.exports = {
   
@@ -53,7 +58,10 @@ module.exports = {
     loginGoogle,
     loginFacebook,
     saveMovie,
-    getMovies
+    getMovies,
+    deleteMovie,
+    getUser,
+    edit
 }
 
 

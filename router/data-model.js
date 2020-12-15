@@ -37,6 +37,12 @@ function getOrders(order){
 function deleteOrder(id){
   return db("orders").delete({"id":id})
 }
+function saveMovie(movie){
+  return db("fav_movies").insert(movie)
+}
+function getMovies(id){
+  return db("fav_movies").where({"user_id":id})
+}
 module.exports = {
   
     register,
@@ -45,7 +51,9 @@ module.exports = {
     getUsers,
     getGoogleUser,
     loginGoogle,
-    loginFacebook
+    loginFacebook,
+    saveMovie,
+    getMovies
 }
 
 

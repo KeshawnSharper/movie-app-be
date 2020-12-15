@@ -22,18 +22,11 @@ exports.up = function(knex) {
         .inTable("users")
         .onDelete("RESTRICT")
         .onUpdate("CASCADE")
-        table.integer("google_user_id",128)
-        .unsigned()
-        .references("google_id")
-        .inTable("users")
-        .onDelete("RESTRICT")
-        .onUpdate("CASCADE")
-        table.integer("facebook_user_id",128)
-        .unsigned()
-        .references("facebook_id")
-        .inTable("users")
-        .onDelete("RESTRICT")
-        .onUpdate("CASCADE")
+        table.string("title",128).notNullable();
+        table.string("poster_path",400).notNullable();
+        table.integer("vote_average",128).notNullable();
+        table.string("overview").notNullable();
+        table.string("release_date",128).notNullable();
         table.integer("movie_id",128).notNullable()
       })
 };

@@ -6,6 +6,10 @@ function getUsers() {
 function getGoogleUser(id) {
   return db("users").where({"google_id":id})
 }
+function getFacebookUser(id) {
+  return db("users").where({"facebook_id":id})
+}
+
 function getInfo(id){
     return db("users").where({"id":id})
 }
@@ -24,6 +28,9 @@ function register(user){
  function loginGoogle(id){
   return db("users").where({"google_id":id})
 }
+function loginFacebook(id){
+  return db("users").where({"facebook_id":id})
+}
 function getOrders(order){
   return db("orders").where({"user_id":order})
 }
@@ -33,10 +40,12 @@ function deleteOrder(id){
 module.exports = {
   
     register,
+    getFacebookUser,
     login,
     getUsers,
     getGoogleUser,
-    loginGoogle
+    loginGoogle,
+    loginFacebook
 }
 
 

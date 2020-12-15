@@ -42,7 +42,7 @@ router.post('/loginGoogle/:id', (req, res) => {
     }
     const token = jwt.sign(payload,"secret",options)
     if (user)
-    {res.status(200).json({google_id:user.google_id,email:user.email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name})}
+    {res.status(200).json({googlegggoo_id:user.google_id,email:user.google_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name})}
    else {
      res.status(404).json({message:`invalid creditinials`})
    }
@@ -53,7 +53,31 @@ router.post('/loginGoogle/:id', (req, res) => {
   });
 
 })
+router.post('/loginFacebook/:id', (req, res) => {
+  data.loginFacebook(req.params.id)
+  .first()
+  .then(user => {
+    console.log(user)
+    const payload = {
+      userid:user.id,
+      username:user.username
+    }
+    const options = {
+      expiresIn:"1d"
+    }
+    const token = jwt.sign(payload,"secret",options)
+    if (user)
+    {res.status(200).json({facebook_id:user.facebook_id,facebook_email:user.facebook_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name})}
+   else {
+     res.status(404).json({message:`invalid creditinials`})
+   }
+  })
+  .catch(err => {
+    res.status(500).json({ message: err })
+    console.log(err)
+  });
 
+})
 router.post('/login', (req, res) => {
   let body = req.body
   console.log(body)
@@ -82,6 +106,15 @@ router.post('/login', (req, res) => {
 });
 router.get('/googleuser/:id', (req, res) => {
   data.getGoogleUser(req.params.id)
+.then(data => {
+  res.status(200).json(data.length === 1);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
+router.get('/facebookuser/:id', (req, res) => {
+  data.getFacebookUser(req.params.id)
 .then(data => {
   res.status(200).json(data.length === 1);
 })

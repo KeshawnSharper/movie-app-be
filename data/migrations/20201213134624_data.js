@@ -29,6 +29,22 @@ exports.up = function(knex) {
         table.string("release_date",128).notNullable();
         table.integer("movie_id",128).notNullable()
       })
+      .createTable('recommended_movies', function (table) {
+        table.increments()
+        table.integer("user_id",128).notNullable()
+        .unsigned()
+        .references("id")
+        .inTable("users")
+        .onDelete("RESTRICT")
+        .onUpdate("CASCADE")
+        table.string("title",128).notNullable();
+        table.string("poster_path",400).notNullable();
+        table.integer("vote_average",128).notNullable();
+        table.string("overview").notNullable();
+        table.string("release_date",128).notNullable();
+        table.integer("movie_id",128).notNullable()
+        table.integer("recommended_movie_id",128).notNullable()
+      })
 };
 
 exports.down = function(knex) {

@@ -34,8 +34,8 @@ function loginFacebook(id){
 function getOrders(order){
   return db("orders").where({"user_id":order})
 }
-function deleteMovie(id){
-  return db("fav_movies").where({"id":id}).delete()
+function deleteMovie(movie_id,id){
+  return db("fav_movies").where({"movie_id":movie_id,"user_id":id}).delete()
 }
 function edit(user){
   return db("users").where({"id":user.id}).update(user)
@@ -47,6 +47,15 @@ function getMovies(id){
   return db("fav_movies").where({"user_id":id})
 }function getUser(id){
   return db("users").where({"id":id})
+}
+function saveRecommendedMovie(movie){
+  return db("recommended_movies").insert(movie)
+}
+function getRecommendedMovie(id){
+  return db("recommended_movies").where({"user_id":id})
+}
+function deleteRecommendedMovie(movie){
+  return db("recommended_movies").where({"recommended_movie_id":movie.movie_id,"user_id":movie.user_id}).delete()
 }
 module.exports = {
   
@@ -61,6 +70,9 @@ module.exports = {
     getMovies,
     deleteMovie,
     getUser,
+    saveRecommendedMovie,
+    getRecommendedMovie,
+    deleteRecommendedMovie,
     edit
 }
 

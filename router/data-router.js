@@ -115,6 +115,37 @@ router.post('/saveMovies', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
+router.get('/recommendedMovies/:id', (req, res) => {
+  data.getRecommendedMovie(req.params.id)
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
+router.delete('/recommendedMovies', (req, res) => {
+  let body = req.body
+  console.log(body)
+  data.deleteRecommendedMovie(body)
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
+router.post('/recommendedMovies', (req, res) => {
+  let body = req.body
+  console.log(body)
+  data.saveRecommendedMovie(body)
+.then(data => {
+  res.status(200).json(data);
+})
+.catch(err => {
+  res.status(500).json({ message: 'Failed to get projects' });
+})
+})
 router.get('/savedMovies/:id', (req, res) => {
   data.getMovies(req.params.id )
 .then(data => {
@@ -124,8 +155,9 @@ router.get('/savedMovies/:id', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
-router.delete('/deleteMovie/:id', (req, res) => {
-  data.deleteMovie(req.params.id)
+router.delete('/deleteMovie/:movie_id/:id', (req, res) => {
+  console.log(req.params.movie_id,req.params.id)
+  data.deleteMovie(req.params.movie_id,req.params.id)
 .then(data => {
   res.status(200).json(data);
 })

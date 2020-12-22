@@ -54,8 +54,8 @@ function saveRecommendedMovie(movie){
 function getRecommendedMovie(id){
   return db("recommended_movies").where({"user_id":id})
 }
-function deleteRecommendedMovie(movie){
-  return db("recommended_movies").where({"recommended_movie_id":movie.movie_id,"user_id":movie.user_id}).delete()
+function deleteRecommendedMovie(recommended_movie_id,user_id){
+  return db("recommended_movies").where({"recommended_movie_id":recommended_movie_id,"user_id":user_id}).delete()
 }
 module.exports = {
   

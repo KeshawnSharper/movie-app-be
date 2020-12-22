@@ -124,10 +124,8 @@ router.get('/recommendedMovies/:id', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
-router.delete('/recommendedMovies', (req, res) => {
-  let body = req.body
-  console.log(body)
-  data.deleteRecommendedMovie(body)
+router.delete('/recommendedMovies/:recommended_movie_id/:user_id', (req, res) => {
+  data.deleteRecommendedMovie(req.params.recommended_movie_id,req.params.user_id)
 .then(data => {
   res.status(200).json(data);
 })

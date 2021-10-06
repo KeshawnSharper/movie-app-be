@@ -10,6 +10,18 @@ const { v4: uuid } = require('uuid');
 const nodemailer = require('nodemailer');
 // router.use(cors({ origin: "*" }));
 // router.use(bodyParser.json());
+require('dotenv').config()
+const AWS = require("aws-sdk")
+const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
+  process.env;
+  console.log(AWS_REGION_ID)
+  AWS.config.update({
+    accessKeyId: AWS_ACCESS,
+    secretAccessKey: AWS_SECRET,
+    region: AWS_REGION_ID
+})
+const dynamoDB = new AWS.DynamoDB.DocumentClient()
+
 router.use(cors());
 
 router.post('/register', (req, res) => {
@@ -29,29 +41,44 @@ res.status(500).json({ message: 'Failed to get schemes' })
 
 
 router.post('/loginGoogle/:id', (req, res) => {
-  data.loginGoogle(req.params.id)
-  .first()
-  .then(user => {
-    console.log(user)
-    const payload = {
-      userid:user.id,
-      username:user.username
-    }
-    const options = {
-      expiresIn:"1d"
-    }
-    const token = jwt.sign(payload,"secret",options)
-    if (user)
-    {res.status(200).json({google_id:user.google_id,email:user.google_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name,user_name:user.user_name})}
-   else {
-     res.status(404).json({message:`invalid creditinials`})
-   }
-  })
-  .catch(err => {
-    res.status(500).json({ message: err })
+console.log(req.body)
+let user = {
+  id:req.params.id,
+  user_name:req.body.user_name,
+  password:null,
+  type:"Google",
+  picture:req.body.profileObj.imageUrl,
+  email:req.body.profileObj.email,
+  first_name:req.body.profileObj.givenName,
+  last_name:req.body.profileObj.familyName
+}
+dynamoDB.scan({TableName: "Movie-Application-users"}, function(err, data) {
+  if (err){
     console.log(err)
-  });
-
+  }
+  else{
+    if (data["Items"].filter(item => item.id === req.params.id).length === 0){
+     
+      dynamoDB.put({TableName: "Movie-Application-users",Item:user},function(err,data){
+        if (err){
+          res.status(500)
+        }
+        else{
+        console.log("HI")
+      }
+    })
+  }
+        const payload = {
+          userid:req.params.id,
+          username:req.body.profileObj.name
+        }
+        const options = {
+          expiresIn:"1d"
+        }
+        const token = jwt.sign(payload,"secret",options)
+        res.status(200).json({email:req.body.profileObj.email,token:token,id:req.params.id,user_name:req.body.profileObj.name})
+  }
+})
 })
 router.post('/loginFacebook/:id', (req, res) => {
   data.loginFacebook(req.params.id)

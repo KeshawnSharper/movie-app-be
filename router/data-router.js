@@ -81,30 +81,45 @@ dynamoDB.scan({TableName: "Movie-Application-users"}, function(err, data) {
 })
 })
 router.post('/loginFacebook/:id', (req, res) => {
-  data.loginFacebook(req.params.id)
-  .first()
-  .then(user => {
-    console.log(user)
-    const payload = {
-      userid:user.id,
-      username:user.username
+  console.log(req.body)
+  let user = {
+    id:req.params.id,
+    user_name:req.body.name,
+    password:null,
+    type:"Facebook",
+    picture:req.body.picture.url,
+    email:req.body.email,
+    first_name:null,
+    last_name:null
+  }
+  dynamoDB.scan({TableName:"Movie-Application-users"}, function(err, data) {
+    if (err){
+      console.log(err)
     }
-    const options = {
-      expiresIn:"1d"
+    else{
+      if (data["Items"].filter(item => item.id === req.params.id).length === 0){
+       
+        dynamoDB.put({TableName: "Movie-Application-users",Item:user},function(err,data){
+          if (err){
+            res.status(500)
+          }
+          else{
+          console.log("HI")
+        }
+      })
     }
-    const token = jwt.sign(payload,"secret",options)
-    if (user)
-    {res.status(200).json({facebook_id:user.facebook_id,facebook_email:user.facebook_email,picture:user.picture,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name,user_name:user.user_name})}
-   else {
-     res.status(404).json({message:`invalid creditinials`})
-   }
+          const payload = {
+            userid:req.params.id,
+            username:req.body.name
+          }
+          const options = {
+            expiresIn:"1d"
+          }
+          const token = jwt.sign(payload,"secret",options)
+          res.status(200).json({email:req.body.email,token:token,id:req.params.id,user_name:req.body.name})
+    }
   })
-  .catch(err => {
-    res.status(500).json({ message: err })
-    console.log(err)
-  });
-
-})
+  })
 router.post('/login', (req, res) => {
   let body = req.body
   console.log(body)
@@ -190,24 +205,7 @@ router.delete('/deleteMovie/:movie_id/:id', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
-router.get('/googleuser/:id', (req, res) => {
-  data.getGoogleUser(req.params.id)
-.then(data => {
-  res.status(200).json(data.length === 1);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
-})
-router.get('/facebookuser/:id', (req, res) => {
-  data.getFacebookUser(req.params.id)
-.then(data => {
-  res.status(200).json(data.length === 1);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
-})
+
 router.get('/users', (req, res) => {
   data.getUsers()
 .then(data => {

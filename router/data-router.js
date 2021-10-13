@@ -23,15 +23,24 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     region: AWS_REGION_ID
 })
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
-//
-let addRecommendations = (movie) => {
-  axios
-  .get(`https://api.themoviedb.org/3/movie/${movie_id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`)
-  .then((res) => {
+// A callback to save reccomended movies 
+let addRecommendations = async(movie) => {
+  axios.get(`https://api.themoviedb.org/3/movie/${movie.id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`).then(async(res) => {
     res.data.results.map((result) => {
-      recommedations(result, movie_id);
+       let new_movie = {
+      userId: movie.userID,
+      id: `${result.id}`,
+      title: result.title,
+      poster_path: result.poster_path,
+      vote_average: result.vote_average,
+      overview: result.overview,
+      recommended_movie_id: movie.id,
+      release_date: result.release_date
+  }
+     putDB("Movie-Application_recommended_movies", new_movie)
     });
   })
+  return scanDB("Movie-Application_recommended_movies",movie.userID,"userID")
 }
 // A callback function for quick calls to DYNAMODB, CALL IT WITH THE AWAIT KEYWORD
 
@@ -182,7 +191,9 @@ router.post('/saveMovie', async (req, res) => {
   body.id = `${body.id}`
   if (items.filter(item => item.id === body.id).length === 0){
   await putDB("Movie-Application-fav-movies",body)
-  res.status(201).json(body)
+  let recommendations = await addRecommendations(body)
+  let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
+  res.status(201).json({movies:movies,recommendations:recommendations})
   }
   else{
     res.status(200).json("Movie already exsists")

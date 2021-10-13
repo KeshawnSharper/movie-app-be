@@ -6,12 +6,14 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const cors = require("cors")
+const axios = require("axios")
 const { v4: uuid } = require('uuid');
 const nodemailer = require('nodemailer');
 // router.use(cors({ origin: "*" }));
 // router.use(bodyParser.json());
 require('dotenv').config()
-const AWS = require("aws-sdk")
+const AWS = require("aws-sdk");
+const { response } = require('express');
 const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
   process.env;
   console.log(AWS_REGION_ID)
@@ -21,6 +23,30 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     region: AWS_REGION_ID
 })
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
+//
+let addRecommendations = (movie) => {
+  axios
+  .get(`https://api.themoviedb.org/3/movie/${movie_id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`)
+  .then((res) => {
+    res.data.results.map((result) => {
+      recommedations(result, movie_id);
+    });
+  })
+}
+// A callback function for quick calls to DYNAMODB, CALL IT WITH THE AWAIT KEYWORD
+
+let scanDB = async (table,filterID,filterProp) => {
+  let items = await dynamoDB.scan({TableName: table}).promise()
+  items = items["Items"]
+  if (filterID !== null){
+    items.filter(item => item[`${filterProp}`] === filterID)
+  }
+  return items
+
+}
+let putDB = async (table,item) => {
+  await dynamoDB.put({TableName: table,Item:item}).promise()
+}
 
 router.use(cors());
 
@@ -87,7 +113,7 @@ router.post('/loginFacebook/:id', (req, res) => {
     user_name:req.body.name,
     password:null,
     type:"Facebook",
-    picture:req.body.picture.url,
+    picture:req.body.picture.data.url,
     email:req.body.email,
     first_name:null,
     last_name:null
@@ -116,7 +142,8 @@ router.post('/loginFacebook/:id', (req, res) => {
             expiresIn:"1d"
           }
           const token = jwt.sign(payload,"secret",options)
-          res.status(200).json({email:req.body.email,token:token,id:req.params.id,user_name:req.body.name})
+          user.token = token
+          res.status(200).json(user)
     }
   })
   })
@@ -146,16 +173,20 @@ router.post('/login', (req, res) => {
     console.log(err)
   });
 });
-router.post('/saveMovies', (req, res) => {
+router.post('/saveMovie', async (req, res) => {
   let body = req.body
   console.log(body)
-  data.saveMovie(body)
-.then(data => {
-  res.status(200).json(data);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
+  let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
+  let recc
+  console.log(items)
+  body.id = `${body.id}`
+  if (items.filter(item => item.id === body.id).length === 0){
+  await putDB("Movie-Application-fav-movies",body)
+  res.status(201).json(body)
+  }
+  else{
+    res.status(200).json("Movie already exsists")
+  }
 })
 router.get('/recommendedMovies/:id', (req, res) => {
   data.getRecommendedMovie(req.params.id)

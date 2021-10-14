@@ -196,7 +196,7 @@ router.post('/saveMovie', async (req, res) => {
   res.status(201).json({movies:movies,recommendations:recommendations})
   }
   else{
-    res.status(200).json("Movie already exsists")
+    res.status(500).json("Movie already exsists")
   }
 })
 router.get('/recommendedMovies/:id', (req, res) => {
@@ -228,14 +228,10 @@ router.post('/recommendedMovies', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
-router.get('/savedMovies/:id', (req, res) => {
-  data.getMovies(req.params.id )
-.then(data => {
-  res.status(200).json(data);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
+router.get('/savedMovies/:id', async(req, res) => {
+  let recommendations = await scanDB("Movie-Application_recommended_movies",req.params.id,"userID")
+  let movies = await scanDB("Movie-Application-fav-movies",req.params.id,"userID")
+  res.status(200).json({movies:movies,recommendations:recommendations})
 })
 router.delete('/deleteMovie/:movie_id/:id', (req, res) => {
   console.log(req.params.movie_id,req.params.id)

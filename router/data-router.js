@@ -59,27 +59,37 @@ let putDB = async (table,item) => {
 
 router.use(cors());
 
-router.post('/register', (req, res) => {
-  console.log(req.body)
+router.post('/register', async(req, res) => {
   let user = req.body
-  let hash = bcrypt.hashSync(user.password,13)
-  user.password = hash 
-  data.register(user)
-  .then(project => {
-    res.status(201).json(project)
-   })
-.catch(err => {
-res.status(500).json({ message: 'Failed to get schemes' })
-})
+  
+  console.log(user)
+  let userFound = await scanDB("Movie-Application-users",user.email,"email")
+  if (userFound.length > 0){
+    res.status(500).json({"message":"User already exists"})
+  }
+  else{
+    let hash = bcrypt.hashSync(user.password,13)
+    user.password = hash 
+    await putDB("Movie-Application-users",user)
+    res.status(201)
+  }
+  // await dynamoDB.put({TableName: "Movie-Application-users",Item:user}).promise()
+//   let user = req.body
+//   .then(project => {
+//     res.status(201).json(project)
+//    })
+// .catch(err => {
+// res.status(500).json({ message: 'Failed to get schemes' })
+// })
 
 })
 
 
-router.post('/loginGoogle/:id', (req, res) => {
+router.post('/loginGoogle/:id', async(req, res) => {
 console.log(req.body)
 let user = {
   id:req.params.id,
-  user_name:req.body.user_name,
+  user_name:null,
   password:null,
   type:"Google",
   picture:req.body.profileObj.imageUrl,
@@ -87,33 +97,16 @@ let user = {
   first_name:req.body.profileObj.givenName,
   last_name:req.body.profileObj.familyName
 }
-dynamoDB.scan({TableName: "Movie-Application-users"}, function(err, data) {
-  if (err){
-    console.log(err)
-  }
-  else{
-    if (data["Items"].filter(item => item.id === req.params.id).length === 0){
-     
-      dynamoDB.put({TableName: "Movie-Application-users",Item:user},function(err,data){
-        if (err){
-          res.status(500)
-        }
-        else{
-        console.log("HI")
-      }
-    })
-  }
-        const payload = {
-          userid:req.params.id,
-          username:req.body.profileObj.name
-        }
-        const options = {
-          expiresIn:"1d"
-        }
-        const token = jwt.sign(payload,"secret",options)
-        res.status(200).json({email:req.body.profileObj.email,token:token,id:req.params.id,user_name:req.body.profileObj.name})
-  }
-})
+
+let userFound = await scanDB("Movie-Application-users",user.email,"email")
+ if (userFound.length === 0){
+  await putDB("Movie-Application-users",user)
+  
+ }
+      const payload = {userid:req.params.id,username:req.body.profileObj.name}
+      const options = {expiresIn:"1d"}
+      user.token = jwt.sign(payload,"secret",options)
+ res.status(201).json(user)
 })
 router.post('/loginFacebook/:id', (req, res) => {
   console.log(req.body)
@@ -186,9 +179,9 @@ router.post('/saveMovie', async (req, res) => {
   let body = req.body
   console.log(body)
   let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-  let recc
   console.log(items)
-  body.id = `${body.id}`
+  body.movie_id = body.id
+  body.id = `${items.length + 1}`
   if (items.filter(item => item.id === body.id).length === 0){
   await putDB("Movie-Application-fav-movies",body)
   let recommendations = await addRecommendations(body)

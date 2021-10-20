@@ -48,7 +48,8 @@ let scanDB = async (table,filterID,filterProp) => {
   let items = await dynamoDB.scan({TableName: table}).promise()
   items = items["Items"]
   if (filterID !== null){
-    items.filter(item => item[`${filterProp}`] === filterID)
+    items = items.filter(item => item[`${filterProp}`] === filterID)
+
   }
   return items
 
@@ -62,7 +63,6 @@ router.use(cors());
 router.post('/register', async(req, res) => {
   let user = req.body
   
-  console.log(user)
   let userFound = await scanDB("Movie-Application-users",user.email,"email")
   if (userFound.length > 0){
     res.status(500).json({"message":"User already exists"})
@@ -70,18 +70,11 @@ router.post('/register', async(req, res) => {
   else{
     let hash = bcrypt.hashSync(user.password,13)
     user.password = hash 
+    let users = await scanDB("Movie-Application-users")
+    user.id = `${users.length + 1}`
     await putDB("Movie-Application-users",user)
-    res.status(201)
+    res.status(201).json({"message":"success"})
   }
-  // await dynamoDB.put({TableName: "Movie-Application-users",Item:user}).promise()
-//   let user = req.body
-//   .then(project => {
-//     res.status(201).json(project)
-//    })
-// .catch(err => {
-// res.status(500).json({ message: 'Failed to get schemes' })
-// })
-
 })
 
 
@@ -149,37 +142,39 @@ router.post('/loginFacebook/:id', (req, res) => {
     }
   })
   })
-router.post('/login', (req, res) => {
-  let body = req.body
-  console.log(body)
-  data.login(body)
-  .first()
-  .then(user => {
-    console.log(user)
-    const payload = {
-      userid:user.id,
-      username:user.username
-    }
-    const options = {
-      expiresIn:"1d"
-    }
-    const token = jwt.sign(payload,"secret",options)
-    if (user && bcrypt.compareSync(body.password,user.password))
-    {res.status(200).json({email:body.email,token:token,userid:user.id,first_name:user.first_name,last_name:user.last_name,user_name:user.user_name})}
-   else {
-     res.status(404).json({message:`invalid creditinials`})
-   }
-  })
-  .catch(err => {
-    res.status(500).json({ message: err })
-    console.log(err)
-  });
+router.post('/login', async(req, res) => {
+  let user = req.body
+  console.log(user)
+  let userFound = await scanDB("Movie-Application-users",user.email,"email")
+ if (userFound.length === 0){
+  res.status(500).json({"message":"User doesn't exist"})
+ }
+ console.log(userFound[0])
+ if (userFound[0].password !== user.password){
+   res.status(500).json({"message":"Invalid Credentials"})
+ }
+ let loggedIn = {
+  first_name: userFound[0].first_name,
+  id: userFound[0].id,
+  email: userFound[0].email,
+  picture: userFound[0].picture,
+  user_name: userFound[0].user_name,
+  last_name:userFound[0].last_name
+ }
+      const payload = {userid:loggedIn.id,username:loggedIn.user_name}
+      const options = {expiresIn:"1d"}
+      loggedIntoken = jwt.sign(payload,"secret",options)
+ res.status(201).json(loggedIn)
 });
 router.post('/saveMovie', async (req, res) => {
   let body = req.body
   console.log(body)
   let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-  console.log(items)
+  if (items.filter(item => item.movie_id === body.movie_id).length > 0){
+    console.log("hi")
+    res.status(500).json({"message":"Movie already saved for this user"})
+    return
+  }
   body.movie_id = body.id
   body.id = `${items.length + 1}`
   if (items.filter(item => item.id === body.id).length === 0){

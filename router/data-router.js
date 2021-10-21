@@ -172,8 +172,10 @@ router.post('/login', async(req, res) => {
 router.post('/saveMovie', async (req, res) => {
   let body = req.body
   let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-  if (items.filter(item => item.movie_id === body.movie_id).length > 0){
+  console.log(items,body)
+  if (items.filter(item => item.movie_id === body.id).length > 0){
     res.status(500).json({"message":"Movie already saved for this user"})
+
     return
   }
   else{
@@ -227,10 +229,22 @@ router.get('/savedMovies/:id', async(req, res) => {
   let movies = await scanDB("Movie-Application-fav-movies",req.params.id,"userID")
   res.status(200).json({movies:movies,recommendations:recommendations})
 })
-router.delete('/deleteMovie/:id/:user_id', async(req, res) => {
-  deleteDB("Movie-Application-fav-movies",req.params.id,"id")
+router.delete('/deleteMovie/:id/:user_id/:movie_id', async(req, res) => {
+  let id = null
+  console.log(req.params.id === "dont")
+  if (req.params.id === "dont"){
+    console.log(req.params.movie_id)
+    let movies = await scanDB("Movie-Application-fav-movies",req.params.user_id,"userID")
+    let delMovie = movies.filter(item => `${item.movie_id}` === `${req.params.movie_id}`)[0]
+    id = delMovie.id
+  }
+  else{
+    id = req.params.id
+  }
+  console.log(id)
+  await deleteDB("Movie-Application-fav-movies",id,"id")
   let movies = await scanDB("Movie-Application-fav-movies",req.params.user_id,"userID")
-  res.status(200).json({movies:movies})
+  res.status(200).json({movies:movies,id:id})
 })
 
 router.get('/users', (req, res) => {

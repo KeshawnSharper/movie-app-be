@@ -25,10 +25,10 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 // A callback to save reccomended movies 
 let addRecommendations = async(movie) => {
-  axios.get(`https://api.themoviedb.org/3/movie/${movie.id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`).then(async(res) => {
+  axios.get(`https://api.themoviedb.org/3/movie/${movie.movie_id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`).then(async(res) => {
     res.data.results.map((result) => {
        let new_movie = {
-      userId: movie.userID,
+      userID: movie.userID,
       id: `${result.id}`,
       title: result.title,
       poster_path: result.poster_path,
@@ -57,7 +57,10 @@ let scanDB = async (table,filterID,filterProp) => {
 let putDB = async (table,item) => {
   await dynamoDB.put({TableName: table,Item:item}).promise()
 }
-
+let deleteDB = async (table,id) => {
+  console.log(id)
+  await dynamoDB.delete({TableName: table,Key:{id:`${id}`}}).promise()
+}
 router.use(cors());
 
 router.post('/register', async(req, res) => {
@@ -168,24 +171,26 @@ router.post('/login', async(req, res) => {
 });
 router.post('/saveMovie', async (req, res) => {
   let body = req.body
-  console.log(body)
   let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
   if (items.filter(item => item.movie_id === body.movie_id).length > 0){
-    console.log("hi")
     res.status(500).json({"message":"Movie already saved for this user"})
     return
   }
+  else{
   body.movie_id = body.id
   body.id = `${items.length + 1}`
+  
   if (items.filter(item => item.id === body.id).length === 0){
   await putDB("Movie-Application-fav-movies",body)
   let recommendations = await addRecommendations(body)
   let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
+  console.log(recommendations)
   res.status(201).json({movies:movies,recommendations:recommendations})
   }
   else{
     res.status(500).json("Movie already exsists")
   }
+}
 })
 router.get('/recommendedMovies/:id', (req, res) => {
   data.getRecommendedMovie(req.params.id)
@@ -217,19 +222,15 @@ router.post('/recommendedMovies', (req, res) => {
 })
 })
 router.get('/savedMovies/:id', async(req, res) => {
+  console.log(req.params.id)
   let recommendations = await scanDB("Movie-Application_recommended_movies",req.params.id,"userID")
   let movies = await scanDB("Movie-Application-fav-movies",req.params.id,"userID")
   res.status(200).json({movies:movies,recommendations:recommendations})
 })
-router.delete('/deleteMovie/:movie_id/:id', (req, res) => {
-  console.log(req.params.movie_id,req.params.id)
-  data.deleteMovie(req.params.movie_id,req.params.id)
-.then(data => {
-  res.status(200).json(data);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
+router.delete('/deleteMovie/:id/:user_id', async(req, res) => {
+  deleteDB("Movie-Application-fav-movies",req.params.id,"id")
+  let movies = await scanDB("Movie-Application-fav-movies",req.params.user_id,"userID")
+  res.status(200).json({movies:movies})
 })
 
 router.get('/users', (req, res) => {

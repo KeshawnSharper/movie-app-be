@@ -24,9 +24,16 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
 })
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 // A callback to save reccomended movies 
+let newMovies = {}
+
 let addRecommendations = async(movie) => {
+  let obj = {}
+  let userMovies = await scanDB("Movie-Application_recommended_movies",movie.userID,"userID")
+  userMovies.map(item => obj[item.id] = true)
+  console.log(obj)
   axios.get(`https://api.themoviedb.org/3/movie/${movie.movie_id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`).then(async(res) => {
     res.data.results.map((result) => {
+      console.log(result)
        let new_movie = {
       userID: movie.userID,
       id: `${result.id}`,
@@ -35,9 +42,16 @@ let addRecommendations = async(movie) => {
       vote_average: result.vote_average,
       overview: result.overview,
       recommended_movie_id: movie.id,
-      release_date: result.release_date
+      release_date: result.release_date,
+      runtime: result.runtime
   }
-     putDB("Movie-Application_recommended_movies", new_movie)
+  if (obj[movie.id] !== true){
+    console.log("bye")
+    putDB("Movie-Application_recommended_movies", new_movie)
+  }
+  else{
+    console.log("hello")
+  }
     });
   })
   return scanDB("Movie-Application_recommended_movies",movie.userID,"userID")
@@ -55,10 +69,10 @@ let scanDB = async (table,filterID,filterProp) => {
 
 }
 let putDB = async (table,item) => {
+  await scanDB(table,item,"recommended_movie_id")
   await dynamoDB.put({TableName: table,Item:item}).promise()
 }
 let deleteDB = async (table,id) => {
-  console.log(id)
   await dynamoDB.delete({TableName: table,Key:{id:`${id}`}}).promise()
 }
 router.use(cors());
@@ -82,7 +96,6 @@ router.post('/register', async(req, res) => {
 
 
 router.post('/loginGoogle/:id', async(req, res) => {
-console.log(req.body)
 let user = {
   id:req.params.id,
   user_name:null,
@@ -105,7 +118,6 @@ let userFound = await scanDB("Movie-Application-users",user.email,"email")
  res.status(201).json(user)
 })
 router.post('/loginFacebook/:id', (req, res) => {
-  console.log(req.body)
   let user = {
     id:req.params.id,
     user_name:req.body.name,
@@ -172,7 +184,6 @@ router.post('/login', async(req, res) => {
 router.post('/saveMovie', async (req, res) => {
   let body = req.body
   let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-  console.log(items,body)
   if (items.filter(item => item.movie_id === body.id).length > 0){
     res.status(500).json({"message":"Movie already saved for this user"})
 
@@ -186,7 +197,6 @@ router.post('/saveMovie', async (req, res) => {
   await putDB("Movie-Application-fav-movies",body)
   let recommendations = await addRecommendations(body)
   let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-  console.log(recommendations)
   res.status(201).json({movies:movies,recommendations:recommendations})
   }
   else{

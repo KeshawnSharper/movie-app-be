@@ -14,6 +14,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config()
 const AWS = require("aws-sdk");
 const { response } = require('express');
+const { del } = require('../data/dbConfig');
 const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
   process.env;
   console.log(AWS_REGION_ID)
@@ -74,6 +75,17 @@ let putDB = async (table,item) => {
 }
 let deleteDB = async (table,id) => {
   await dynamoDB.delete({TableName: table,Key:{id:`${id}`}}).promise()
+}
+let editDB = async (table,id,body) => {
+console.log(body)
+let updateString = "set "
+let UpdateExpressionObj= {}
+for  (let [key, value] of Object.entries(body)) {
+  updateString += `${key} = :${key},`
+  UpdateExpressionObj[`:${key}`] = `${value}`
+}
+updateString = updateString.slice(0,-1)
+  await dynamoDB.update({TableName: table,Key:{"id":id},UpdateExpression:updateString,ExpressionAttributeValues:UpdateExpressionObj}).promise()
 }
 router.use(cors());
 
@@ -266,26 +278,20 @@ router.get('/users', (req, res) => {
   res.status(500).json({ message: 'Failed to get projects' });
 })
 })
-router.get('/users/:id', (req, res) => {
-  data.getUser(req.params.id)
-.then(data => {
-  res.status(200).json(data);
+router.get('/users/:id', async (req, res) => {
+  let user = await scanDB("Movie-Application-users",req.params.id,"id")
+ user  = user[0]
+ delete user.password
+res.status(201).json({"user":user})
 })
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
+router.put('/users/:id', async (req, res) => {
+ await editDB("Movie-Application-users",req.params.id,req.body)
+ let user = await scanDB("Movie-Application-users",req.params.id,"id")
+ user  = user[0]
+ delete user.password
+res.status(201).json({"user":user})
 })
-})
-router.put('/users', (req, res) => {
-  let body = req.body
-  console.log(body)
-  data.edit(body)
-.then(data => {
-  res.status(200).json(data);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
-})
+
 router.post('/orders', (req, res) => {
   var today = new Date();
   req.body.delivered = false

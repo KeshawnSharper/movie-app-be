@@ -177,28 +177,24 @@ router.post('/login', async(req, res) => {
  if (userFound.length === 0){
   res.status(501).json({"message":"User doesn't exist"})
  }
- console.log(userFound[0])
- bcrypt.compare(userFound[0].password, user.password, function(err) {
-  if (err){
-    res.status(500).json({"message":"Invalid Credentials"})
-  }
- else {
-  let loggedIn = {
-    first_name: userFound[0].first_name,
-    id: userFound[0].id,
-    email: userFound[0].email,
-    picture: userFound[0].picture,
-    user_name: userFound[0].user_name,
-    last_name:userFound[0].last_name
+ userFound = userFound[0]
+if (userFound && bcrypt.compareSync(user.password,userFound.password)){
+    let loggedIn = {
+    first_name: userFound.first_name,
+    id: userFound.id,
+    email: userFound.email,
+    picture: userFound.picture,
+    user_name: userFound.user_name,
+    last_name:userFound.last_name
    }
         const payload = {userid:loggedIn.id,username:loggedIn.user_name}
         const options = {expiresIn:"1d"}
         loggedIn.token = jwt.sign(payload,"secret",options)
    res.status(201).json(loggedIn)
-  }
-});
-
- 
+}
+ else{
+  res.status(500).json({message:`Invalid Credentials`})
+ }
 });
 router.post('/saveMovie', async (req, res) => {
   let body = req.body

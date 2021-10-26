@@ -99,6 +99,7 @@ router.post('/register', async(req, res) => {
   else{
     let hash = bcrypt.hashSync(user.password,13)
     user.password = hash 
+    delete user.re_password
     let users = await scanDB("Movie-Application-users")
     user.id = `${users.length + 1}`
     await putDB("Movie-Application-users",user)
@@ -174,24 +175,30 @@ router.post('/login', async(req, res) => {
   console.log(user)
   let userFound = await scanDB("Movie-Application-users",user.email,"email")
  if (userFound.length === 0){
-  res.status(500).json({"message":"User doesn't exist"})
+  res.status(501).json({"message":"User doesn't exist"})
  }
  console.log(userFound[0])
- if (userFound[0].password !== user.password){
-   res.status(500).json({"message":"Invalid Credentials"})
- }
- let loggedIn = {
-  first_name: userFound[0].first_name,
-  id: userFound[0].id,
-  email: userFound[0].email,
-  picture: userFound[0].picture,
-  user_name: userFound[0].user_name,
-  last_name:userFound[0].last_name
- }
-      const payload = {userid:loggedIn.id,username:loggedIn.user_name}
-      const options = {expiresIn:"1d"}
-      loggedIntoken = jwt.sign(payload,"secret",options)
- res.status(201).json(loggedIn)
+ bcrypt.compare(userFound[0].password, user.password, function(err) {
+  if (err){
+    res.status(500).json({"message":"Invalid Credentials"})
+  }
+ else {
+  let loggedIn = {
+    first_name: userFound[0].first_name,
+    id: userFound[0].id,
+    email: userFound[0].email,
+    picture: userFound[0].picture,
+    user_name: userFound[0].user_name,
+    last_name:userFound[0].last_name
+   }
+        const payload = {userid:loggedIn.id,username:loggedIn.user_name}
+        const options = {expiresIn:"1d"}
+        loggedIn.token = jwt.sign(payload,"secret",options)
+   res.status(201).json(loggedIn)
+  }
+});
+
+ 
 });
 router.post('/saveMovie', async (req, res) => {
   let body = req.body

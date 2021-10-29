@@ -178,6 +178,10 @@ router.post('/login', async(req, res) => {
   res.status(501).json({"message":"User doesn't exist"})
  }
  userFound = userFound[0]
+ console.log(userFound,user.password)
+ if (userFound.password === null){
+   res.status(502).json({"message":"User is signed in with Google"})
+ }
 if (userFound && bcrypt.compareSync(user.password,userFound.password)){
     let loggedIn = {
     first_name: userFound.first_name,

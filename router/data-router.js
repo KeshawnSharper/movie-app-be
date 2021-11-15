@@ -14,7 +14,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config()
 const AWS = require("aws-sdk");
 const { response } = require('express');
-const { del } = require('../data/dbConfig');
+const { del } = require('../data/dbConfig')
 const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
   process.env;
   console.log(AWS_REGION_ID)

@@ -23,6 +23,11 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     secretAccessKey: AWS_SECRET,
     region: AWS_REGION_ID
 })
+let cors = (res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
+}
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 // A callback to save reccomended movies 
 let newMovies = {}
@@ -88,6 +93,12 @@ updateString = updateString.slice(0,-1)
   await dynamoDB.update({TableName: table,Key:{"id":id},UpdateExpression:updateString,ExpressionAttributeValues:UpdateExpressionObj}).promise()
 }
 router.use(cors());
+router.use((res,req,headers) => {
+  res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
+}
+    )
 
 router.post('/register', async(req, res) => {
   let user = req.body

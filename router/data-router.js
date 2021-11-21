@@ -88,7 +88,6 @@ for  (let [key, value] of Object.entries(body)) {
 updateString = updateString.slice(0,-1)
   await dynamoDB.update({TableName: table,Key:{"id":id},UpdateExpression:updateString,ExpressionAttributeValues:UpdateExpressionObj}).promise()
 }
-router.use(cors());
 
 router.post('/register', async(req, res) => {
   let user = req.body
@@ -172,6 +171,7 @@ router.post('/loginFacebook/:id', (req, res) => {
   })
   })
 router.post('/login', async(req, res) => {
+  try{
   let user = req.body
   console.log(user)
   let userFound = await scanDB("Movie-Application-users",user.email,"email")
@@ -200,6 +200,10 @@ if (userFound && bcrypt.compareSync(user.password,userFound.password)){
  else{
   res.status(500).json({message:`Invalid Credentials`})
  }
+}
+catch(err){
+  console.log(err)
+}
 });
 router.post('/saveMovie', async (req, res) => {
   let body = req.body

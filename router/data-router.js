@@ -9,7 +9,7 @@ const cors = require("cors")
 const axios = require("axios")
 const { v4: uuid } = require('uuid');
 const nodemailer = require('nodemailer');
-// router.use(cors({ origin: "*" }));
+router.use(cors({ origin: "*" }));
 // router.use(bodyParser.json());
 require('dotenv').config()
 const AWS = require("aws-sdk");

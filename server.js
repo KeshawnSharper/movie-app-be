@@ -7,7 +7,7 @@ const cors = require('cors');
 
 server.use(helmet());
 server.use(express.json());
-router.use(cors({ origin: "*" }));
+server.use(cors());
 server.use('/', dataRouter);
 
 

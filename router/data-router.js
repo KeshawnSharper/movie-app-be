@@ -128,50 +128,10 @@ let userFound = await scanDB("Movie-Application-users",user.email,"email")
       user.token = jwt.sign(payload,"secret",options)
  res.status(201).json(user)
 })
-router.post('/loginFacebook/:id', (req, res) => {
-  let user = {
-    id:req.params.id,
-    user_name:req.body.name,
-    password:null,
-    type:"Facebook",
-    picture:req.body.picture.data.url,
-    email:req.body.email,
-    first_name:null,
-    last_name:null
-  }
-  dynamoDB.scan({TableName:"Movie-Application-users"}, function(err, data) {
-    if (err){
-      console.log(err)
-    }
-    else{
-      if (data["Items"].filter(item => item.id === req.params.id).length === 0){
-       
-        dynamoDB.put({TableName: "Movie-Application-users",Item:user},function(err,data){
-          if (err){
-            res.status(500)
-          }
-          else{
-          console.log("HI")
-        }
-      })
-    }
-          const payload = {
-            userid:req.params.id,
-            username:req.body.name
-          }
-          const options = {
-            expiresIn:"1d"
-          }
-          const token = jwt.sign(payload,"secret",options)
-          user.token = token
-          res.status(200).json(user)
-    }
-  })
-  })
+// 
 router.post('/login', async(req, res) => {
   try{
   let user = req.body
-  console.log(user)
   let userFound = await scanDB("Movie-Application-users",user.email,"email")
  if (userFound.length === 0){
   res.status(501).json({"message":"User doesn't exist"})

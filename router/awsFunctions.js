@@ -11,7 +11,7 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient()
 module.exports ={
 scanDB: async (table,filterID,filterProp) => {
     if (table instanceof String === false){
-      return `Table name is not a string it is a ${typeof table}`
+      return `ScanDB's parameter Table name must be a string recieved a ${typeof table}`
     }
     let items = await dynamoDB.scan({TableName: table}).promise()
     items = items["Items"]

@@ -57,13 +57,20 @@ let addRecommendations = async(movie) => {
   return scanDB("Movie-Application_recommended_movies",movie.userID,"userID")
 }
 // A callback function for quick calls to DYNAMODB, CALL IT WITH THE AWAIT KEYWORD
-
+// the scanDB function must return an array 
+  // the first argumment must be a string
+    // if the first argument's table string doesn't exist then return an error 
+  // the second argument can be anything 
+  // The last argument must be string 
+  // if the item doesn't exist in the database then return "Item doesn't exist"
 let scanDB = async (table,filterID,filterProp) => {
+  if (typeof table !== 'string'){
+    return `Table name isn't a string it's a ${typeof table}`
+  }
   let items = await dynamoDB.scan({TableName: table}).promise()
   items = items["Items"]
   if (filterID !== null){
     items = items.filter(item => item[`${filterProp}`] === filterID)
-
   }
   return items
 
@@ -370,4 +377,4 @@ router.post('/email', (req, res) => {
 })
 
 
-module.exports = router
+module.exports = {router:router,scanDB:scanDB}

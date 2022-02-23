@@ -212,7 +212,7 @@ router.get('/recommendedMovies/:id', (req, res) => {
   res.status(200).json(data);
 })
 .catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
+  res.status(500).json({"message": 'Failed to get projects' });
 })
 })
 router.delete('/recommendedMovies/:recommended_movie_id/:user_id', (req, res) => {
@@ -221,7 +221,7 @@ router.delete('/recommendedMovies/:recommended_movie_id/:user_id', (req, res) =>
   res.status(200).json(data);
 })
 .catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
+  res.status(500).json({ "message": 'Failed to get projects' });
 })
 })
 router.post('/recommendedMovies', (req, res) => {
@@ -232,7 +232,7 @@ router.post('/recommendedMovies', (req, res) => {
   res.status(200).json(data);
 })
 .catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
+  res.status(500).json({ "message": 'Failed to get projects' });
 })
 })
 router.get('/savedMovies/:id', async(req, res) => {
@@ -256,7 +256,7 @@ router.delete('/deleteMovie/:id/:user_id/:movie_id', async(req, res) => {
   console.log(id)
   await deleteDB("Movie-Application-fav-movies",id,"id")
   let movies = await scanDB("Movie-Application-fav-movies",req.params.user_id,"userID")
-  res.status(200).json({movies:movies,id:id})
+  res.status(200).json({"movies":movies,"id":id})
 })
 
 router.get('/users', (req, res) => {

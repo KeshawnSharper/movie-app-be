@@ -92,7 +92,7 @@ for  (let [key, value] of Object.entries(body)) {
 updateString = updateString.slice(0,-1)
   await dynamoDB.update({TableName: table,Key:{"id":id},UpdateExpression:updateString,ExpressionAttributeValues:UpdateExpressionObj}).promise()
 }
-console.log(process.env)
+console.log(AWS_REGION_ID,AWS_ACCESS,AWS_SECRET)
 router.post('/register', async(req, res) => {
   let user = req.body
   let message = "Couldn't Register User"

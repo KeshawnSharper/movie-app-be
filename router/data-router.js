@@ -18,6 +18,7 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     secretAccessKey: AWS_SECRET,
     region: AWS_REGION_ID
 })
+console
 const globalFunctions = require('./globalFunctions')
 const {checkUser} = globalFunctions
 
@@ -91,6 +92,7 @@ for  (let [key, value] of Object.entries(body)) {
 updateString = updateString.slice(0,-1)
   await dynamoDB.update({TableName: table,Key:{"id":id},UpdateExpression:updateString,ExpressionAttributeValues:UpdateExpressionObj}).promise()
 }
+console.log(process.env)
 router.post('/register', async(req, res) => {
   let user = req.body
   let message = "Couldn't Register User"

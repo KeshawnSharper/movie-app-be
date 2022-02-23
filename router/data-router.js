@@ -285,7 +285,7 @@ res.status(201).json({"user":user})
 })
 
 router.post('/orders', (req, res) => {
-  var today = new Date();
+  var today = new Date()
   req.body.delivered = false
   console.log('req.body',req.body)
   data.purchase(req.body)

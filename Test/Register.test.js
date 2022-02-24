@@ -119,7 +119,7 @@ describe('/POST Register: Checking for required fields', () => {
 
 describe('/POST Register: Checking the field types', async() => {
   
-  it("testing if password field isn't string", async() => {
+  it("testing if Password field isn't string", async() => {
     const attempt = await chai.request(server)
         .post('/register')
         .send({
@@ -127,7 +127,6 @@ describe('/POST Register: Checking the field types', async() => {
         user_name: "",
         first_name: "",
         last_name: "",
-        password: "",
         re_password:"",
         email: "",
         picture:""})
@@ -136,19 +135,96 @@ describe('/POST Register: Checking the field types', async() => {
        attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
   })
 
-  it("testing if re_password field isn't string", async() => {
+  it("testing if Re_Password field isn't string", async() => {
     const attempt = await chai.request(server)
         .post('/register')
-        .send({password:"567",re_password:456,email:"jhgbvftyhgb"})
+        .send({
+          password:"" ,
+          user_name: "",
+          first_name: "",
+          last_name: "",
+          re_password:457,
+          email: "",
+          picture:""})
        attempt.should.have.status(500)
        attempt.should.be.json;
        attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
   })
 
-  it("testing if email field isn't string", async() => {
+  it("testing if Email field isn't string", async() => {
     const attempt = await chai.request(server)
         .post('/register')
-        .send({password:"567",re_password:"456",email:765876})
+        .send({
+          password:"" ,
+          user_name: "",
+          first_name: "",
+          last_name: "",
+          re_password:"",
+          email: 23,
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
+  })
+  it("testing if First Name field isn't string", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"" ,
+          user_name: "",
+          first_name: null,
+          last_name: "",
+          re_password:"",
+          email: "",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
+  })
+
+  it("testing if Last Name field isn't string", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"567" ,
+          user_name: "",
+          first_name: "",
+          last_name: [],
+          re_password:"",
+          email: "",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
+  })
+
+  it("testing if Picture field isn't string", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"567" ,
+          user_name: "",
+          first_name: 23,
+          last_name: "",
+          re_password:"",
+          email: "",
+          picture:{}})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
+  })
+
+  it("testing if User Name field isn't string", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"" ,
+          user_name: false,
+          first_name: "",
+          last_name: "",
+          re_password:"",
+          email: "",
+          picture:""})
        attempt.should.have.status(500)
        attempt.should.be.json;
        attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')

@@ -118,48 +118,17 @@ describe('/POST Register: Checking for required fields', () => {
 })
 
 describe('/POST Register: Checking the field types', async() => {
-  
-  it("testing if Password field isn't string", async() => {
-    const attempt = await chai.request(server)
-        .post('/register')
-        .send({
-        password:567 ,
-        user_name: "",
-        first_name: "",
-        last_name: "",
-        re_password:"",
-        email: "",
-        picture:""})
-       attempt.should.have.status(500)
-       attempt.should.be.json;
-       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
-  })
 
-  it("testing if Re_Password field isn't string", async() => {
-    const attempt = await chai.request(server)
-        .post('/register')
-        .send({
-          password:"" ,
-          user_name: "",
-          first_name: "",
-          last_name: "",
-          re_password:457,
-          email: "",
-          picture:""})
-       attempt.should.have.status(500)
-       attempt.should.be.json;
-       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
-  })
 
   it("testing if Email field isn't string", async() => {
     const attempt = await chai.request(server)
         .post('/register')
         .send({
-          password:"" ,
+          password:"jgjuhhiouyhgfvbhjkoG6#",
           user_name: "",
           first_name: "",
           last_name: "",
-          re_password:"",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#",
           email: 23,
           picture:""})
        attempt.should.have.status(500)
@@ -170,12 +139,12 @@ describe('/POST Register: Checking the field types', async() => {
     const attempt = await chai.request(server)
         .post('/register')
         .send({
-          password:"" ,
+          password:"jgjuhhiouyhgfvbhjkoG6#" ,
           user_name: "",
           first_name: null,
           last_name: "",
-          re_password:"",
-          email: "",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#",
+          email: "test@example.com",
           picture:""})
        attempt.should.have.status(500)
        attempt.should.be.json;
@@ -186,12 +155,12 @@ describe('/POST Register: Checking the field types', async() => {
     const attempt = await chai.request(server)
         .post('/register')
         .send({
-          password:"567" ,
+          password:"jgjuhhiouyhgfvbhjkoG6#" ,
           user_name: "",
           first_name: "",
           last_name: [],
-          re_password:"",
-          email: "",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#",
+          email: "test@example.com",
           picture:""})
        attempt.should.have.status(500)
        attempt.should.be.json;
@@ -202,12 +171,12 @@ describe('/POST Register: Checking the field types', async() => {
     const attempt = await chai.request(server)
         .post('/register')
         .send({
-          password:"567" ,
+          password:"jgjuhhiouyhgfvbhjkoG6#" ,
           user_name: "",
           first_name: 23,
           last_name: "",
-          re_password:"",
-          email: "",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#",
+          email: "test@example.com",
           picture:{}})
        attempt.should.have.status(500)
        attempt.should.be.json;
@@ -218,17 +187,173 @@ describe('/POST Register: Checking the field types', async() => {
     const attempt = await chai.request(server)
         .post('/register')
         .send({
-          password:"" ,
+          password:"jgjuhhiouyhgfvbhjkoG6#" ,
           user_name: false,
           first_name: "",
           last_name: "",
-          re_password:"",
-          email: "",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#",
+          email: "test@example.com",
           picture:""})
        attempt.should.have.status(500)
        attempt.should.be.json;
        attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
   })
 })
+
+describe('/POST Register: Checking if the password security', async() => {
+  it("Checking if the password and re_password fields arent the same", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"jgjuhhiouyhgfvbhjkoG6#",
+          user_name: false,
+          first_name: "",
+          last_name: "",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#tgfvbhjuytgf",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"password and re_password must be the same"}')
+  })
+
+  it("Checking if the password and re_password are the same but not 7 characters or more", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"123",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"123",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password not secure enough"}')
+  })
+
+  it("Checking if the password and re_password are the same but don't have special characters", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"fredKruger123",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"fredKruger123",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password not secure enough"}')
+  })
+
+  it("Checking if the password and re_password are the same but don't have upper case characters", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"fredkruger123@",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"fredkruger123@",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password not secure enough"}')
+  })
+
+  it("Checking if the password and re_password are the same but don't have lower case characters", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"FREDKRUGER123@",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"FREDKRUGER123@",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password not secure enough"}')
+  })
+
+  it("Checking if the password and re_password are the same but are only number characters", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"123456789",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"123456789",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password not secure enough"}')
+  })
+
+  it("Checking if the password and re_password are the same but have no number characters", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"fredKrugerisdead#",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"fredKrugerisdead#",
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password not secure enough"}')
+  })
+  it("Checking if the password and re_password are the same but have no number characters", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:[1,2,2,3,4,5,6,7,8,9,10,11,12],
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:[1,2,2,3,4,5,6,7,8,9,10,11,12],
+          email: "test@example.com",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Password fields must be a string"}')
+  })
+})
+
+describe('/POST Register: Checking if the email is valid ', async() => { 
+  it("Checking if the email is blank", async() => {
+    const attempt = await chai.request(server)
+        .post('/register')
+        .send({
+          password:"jgjuhhiouyhgfvbhjkoG6#",
+          user_name:"",
+          first_name: "",
+          last_name: "",
+          re_password:"jgjuhhiouyhgfvbhjkoG6#",
+          email: "",
+          picture:""})
+       attempt.should.have.status(500)
+       attempt.should.be.json;
+       attempt.should.have.property("text").eql('{"message":"Email not valid"}')
+  })
+} )
+
+
+// what happens if the user already exists 
+
+
+// what happens if the email isn't an email address
+
+// what happens on a successful registration
+
 
  

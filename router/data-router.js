@@ -6,6 +6,8 @@ const multer = require("multer")
 const axios = require("axios")
 const { v4: uuid } = require('uuid');
 const nodemailer = require('nodemailer');
+const {scanDB} = require('./awsFunctions')
+const storage = require('node-sessionstorage')
 // router.use(bodyParser.json());
 require('dotenv').config()
 const AWS = require("aws-sdk");
@@ -20,7 +22,7 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
 })
 console
 const globalFunctions = require('./globalFunctions')
-const {checkUser} = globalFunctions
+const {checkUser,checkAWSCreds,checkGlobalUser,getPrimitiveType} = globalFunctions
 
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 // A callback to save reccomended movies 
@@ -63,17 +65,26 @@ let addRecommendations = async(movie) => {
   // the second argument can be anything 
   // The last argument must be string 
   // if the item doesn't exist in the database then return "Item doesn't exist"
-let scanDB = async (table,filterID,filterProp) => {
-  if (typeof table !== 'string'){
-    return `Table name isn't a string it's a ${typeof table}`
-  }
-  let items = await dynamoDB.scan({TableName: table}).promise()
-  items = items["Items"]
-  if (filterID !== null){
-    items = items.filter(item => item[`${filterProp}`] === filterID)
-  }
-  return items
-}
+// let scanDB = async (table,filterID,filterProp) => {
+  
+//   await dynamoDB.scan({TableName: table}).promise()
+//   .then(res => res.json())
+//   .then(res => console.log(res))
+//   .catch(err => {
+//     console.log("hello")
+//     console.log(err.code)
+//   }
+//     )
+//   // if (typeof table !== 'string'){
+//   //   return `Table name isn't a string it's a ${typeof table}`
+//   // }
+//   // let items = await dynamoDB.scan({TableName: table}).promise()
+//   // items = items["Items"]
+//   // if (filterID !== null){
+//   //   items = items.filter(item => item[`${filterProp}`] === filterID)
+//   // }
+//   // return items
+// }
 let putDB = async (table,item) => {
   await scanDB(table,item,"recommended_movie_id")
   await dynamoDB.put({TableName: table,Item:item}).promise()
@@ -100,27 +111,38 @@ router.post('/register', async(req, res) => {
   // try {
   // console.log('data-router:100',req)
   let checkedUser = checkUser(user)
-  if (!checkedUser.status) {
+  if (checkedUser.status === false) {
     res.status(500).json({"message":checkedUser.message})
     return
   }
-  let userFound = await scanDB("Movie-Application-users",user.email,"email")
-  if (userFound.length > 0){
+  let awsUsers = await scanDB("Movie-Application-users",user.email,"email")
+  console.log(awsUsers.selected_users)
+
+  if (awsUsers.status === false) {
+    res.status(500).json({"message":awsUsers.message})
+    return 
+  }
+  console.log(awsUsers.selected_users)
+
+  if (awsUsers.selected_users.length > 0){
     res.status(500).json({"message":"User already exists"})
+    return
   }
   else{
     let hash = bcrypt.hashSync(user.password,13)
     user.password = hash 
-    delete user.re_password
-    let users = await scanDB("Movie-Application-users")
+    user.re_password = hash
+    let users = awsUsers.total_users
     user.id = `${users.length + 1}`
     await putDB("Movie-Application-users",user)
     res.status(201).json({"message":"success"})
+    return
   }
 
 // }
 // catch (err) {
   res.status(500).json({"message":message})
+  return
 // }
 })
 // router.get('/register', (req, res) => {
@@ -135,7 +157,7 @@ let user = {
   password:null,
   type:"Google",
   picture:req.body.profileObj.imageUrl,
-  email:req.body.profileObj.email,
+  email:req.body.profileObj.email.toLowerCase(),
   first_name:req.body.profileObj.givenName,
   last_name:req.body.profileObj.familyName
 }
@@ -154,15 +176,29 @@ let userFound = await scanDB("Movie-Application-users",user.email,"email")
 router.post('/login', async(req, res) => {
   try{
   let user = req.body
-  let userFound = await scanDB("Movie-Application-users",user.email,"email")
- if (userFound.length === 0){
-  res.status(501).json({"message":"User doesn't exist"})
+  if (getPrimitiveType(user.email) === 'string') {
+    user.email = user.email.toString().toLowerCase()
+  }
+  let checkedGlobalUser = checkGlobalUser(user,{"email":"string","password":"string"})
+  if (checkedGlobalUser.status === false) {
+    res.status(500).json({"message":checkedGlobalUser.message})
+    return
+  } 
+    
+let userFound
+
+if (storage.getItem(user.email) !== undefined){
+  userFound = JSON.parse(storage.getItem(user.email))
+}
+else{
+  userFound = await scanDB("Movie-Application-users",user.email,"email")
+  userFound = userFound.selected_users
+ if (userFound.length === 0) {
+  res.status(500).json({"message":"User doesnt exist"})
+  return
  }
  userFound = userFound[0]
- console.log(userFound,user.password)
- if (userFound.password === null){
-   res.status(502).json({"message":"User is signed in with Google"})
- }
+}
 if (userFound && bcrypt.compareSync(user.password,userFound.password)){
     let loggedIn = {
     first_name: userFound.first_name,
@@ -172,13 +208,16 @@ if (userFound && bcrypt.compareSync(user.password,userFound.password)){
     user_name: userFound.user_name,
     last_name:userFound.last_name
    }
+   storage.setItem(userFound.email, JSON.stringify(userFound))
         const payload = {userid:loggedIn.id,username:loggedIn.user_name}
         const options = {expiresIn:"1d"}
         loggedIn.token = jwt.sign(payload,"secret",options)
    res.status(201).json(loggedIn)
+   return
 }
  else{
   res.status(500).json({message:`Invalid Credentials`})
+  return
  }
 }
 catch(err){

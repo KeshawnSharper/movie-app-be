@@ -9,11 +9,12 @@ const getPrimitiveType = (value) => {
     }
   return `${typeof value}`
 }
-const returnMissingFields = (arr,obj) => {
+const returnMissingFields = (obj,arr) => {
 let res = []
 for (let i = 0; i < arr.length; i++){
   if (arr[i] in obj === false){
     res.push(arr[i])
+    return res
   }
 }
 return res
@@ -34,7 +35,7 @@ const getStringCharacterType = (value) => {
   }
 }
 const checkUser = (user) => {
-  let missingFields = returnMissingFields(["first_name", "last_name", "email","password","re_password","picture","user_name"],user)
+  let missingFields = returnMissingFields(user,["first_name", "last_name", "email","password","re_password","picture","user_name"],)
   if (missingFields.length > 0) {
       return {status:false,message:"Missing key properties"}
     }
@@ -44,7 +45,7 @@ const checkUser = (user) => {
     if(checkedPassword.status === false) {
       return checkedPassword
     }
-    
+
     if(verifiedEmail.status === false) {
       return verifiedEmail
     }
@@ -54,27 +55,65 @@ const checkUser = (user) => {
      }
     
   }
+  return {status:true}
+}
+
+const checkGlobalUser = (user,obj) => {
+  let missingFields = returnMissingFields(user,Object.keys(obj))
+  if (missingFields.length > 0) {
+      return {status:false,message:"Missing key properties"}
+    }
+    if (user.email !== undefined) {
+      let verifiedEmail = verifyEmail(user.email)
+      if(verifiedEmail.status === false) {
+        return verifiedEmail
+      }
+    }
+    if (user.password !== undefined) {
+      let checkedPassword = checkPassword(user)
+
+      if(checkedPassword.status === false) {
+        return checkedPassword
+      }
+    }
+    
+    for (const [key, value] of Object.entries(user)) {
+      if (getPrimitiveType(value) !== obj[key]){
+        return {status:false,message:` ${key} must be a ${obj[key]}`}
+     }
+    
+  }
+  return {status:true}
 }
 
 const verifyEmail = (email) => {
-  if (email.includes('@') && email.includes('.com') && email.length > 7){
+  if (getPrimitiveType(email) !== 'string'){
+    return {status:false,message:"Email not valid"}
+  }
+
+  if (getPrimitiveType(email) === 'string' && email.includes('@') && email.includes('.com') && email.length > 7){
     return true
   }
   return {status:false,message:"Email not valid"}
 }
 
 const checkPassword = ({password,re_password}) => {
-  if(getPrimitiveType(password) !== 'string' || getPrimitiveType(re_password) !== 'string' ){
+  if (getPrimitiveType(password) !== 'string'){
     return {status:false,message:"Password fields must be a string"}
   }
-  if (password !== re_password){
-    return {status:false,message:"password and re_password must be the same"}
+  if (re_password !== undefined){
+    if(getPrimitiveType(re_password) !== 'string' ){
+      return {status:false,message:"Password fields must be a string"}
+    }
+    if (password !== re_password){
+      return {status:false,message:"password and re_password must be the same"}
+    }
   }
-  let password_req = {cap:false,low:false,char:false,num:false,}
+ 
   if (password.length < 7){
     return {status:false,message:"Password not secure enough"}
   }
-
+  let password_req = {cap:false,low:false,char:false,num:false,}
   for (let i = 0; i < password.length; i++) {
     
     if (getStringCharacterType(password[i]) === "Lowercase String"){
@@ -95,6 +134,13 @@ const checkPassword = ({password,re_password}) => {
   return password_req["num"] === true && password_req['cap'] === true && password_req['low'] === true && password_req['char'] === true ?  true  : {status:false,message:"Password not secure enough"}
 
 }
+checkAWSCreds = ({AWS_ACCESS, AWS_SECRET,AWS_REGION_ID}) => {
+  if (AWS_ACCESS === undefined || AWS_SECRET === undefined || AWS_REGION_ID === undefined){
+    return {status:false,message:"Invalid AWS credentials"}
+  }
+  return {status:true,message:"Valid Credentials"}
+
+}
 
 
-module.exports = {getPrimitiveType:getPrimitiveType,checkUser:checkUser}
+module.exports = {checkAWSCreds:checkAWSCreds,getPrimitiveType:getPrimitiveType,checkUser:checkUser,checkGlobalUser:checkGlobalUser}

@@ -133,7 +133,7 @@ describe('/POST Register: Checking the field types', async() => {
           picture:""})
        attempt.should.have.status(500)
        attempt.should.be.json;
-       attempt.should.have.property("text").eql('{"message":"All user properties must be a string"}')
+       attempt.should.have.property("text").eql('{"message":"Email not valid"}')
   })
   it("testing if First Name field isn't string", async() => {
     const attempt = await chai.request(server)
@@ -345,15 +345,113 @@ describe('/POST Register: Checking if the email is valid ', async() => {
        attempt.should.be.json;
        attempt.should.have.property("text").eql('{"message":"Email not valid"}')
   })
-} )
+
+    it("Checking if the email is an array", async() => {
+      const attempt = await chai.request(server)
+          .post('/register')
+          .send({
+            password:"jgjuhhiouyhgfvbhjkoG6#",
+            user_name:"",
+            first_name: "",
+            last_name: "",
+            re_password:"jgjuhhiouyhgfvbhjkoG6#",
+            email: [1,2,2,3,4,5,6,7,8,9,10,11,12],
+            picture:""})
+         attempt.should.have.status(500)
+         attempt.should.be.json;
+         attempt.should.have.property("text").eql('{"message":"Email not valid"}')
+    })
+
+    it("Checking if the email is an object", async() => {
+      const attempt = await chai.request(server)
+          .post('/register')
+          .send({
+            password:"jgjuhhiouyhgfvbhjkoG6#",
+            user_name:"",
+            first_name: "",
+            last_name: "",
+            re_password:"jgjuhhiouyhgfvbhjkoG6#",
+            email: {},
+            picture:""})
+         attempt.should.have.status(500)
+         attempt.should.be.json;
+         attempt.should.have.property("text").eql('{"message":"Email not valid"}')
+    })
+
+    it("Checking if the email is a string, has @ but no .com", async() => {
+      const attempt = await chai.request(server)
+          .post('/register')
+          .send({
+            password:"jgjuhhiouyhgfvbhjkoG6#",
+            user_name:"",
+            first_name: "",
+            last_name: "",
+            re_password:"jgjuhhiouyhgfvbhjkoG6#",
+            email: "test@example.org",
+            picture:""})
+         attempt.should.have.status(500)
+         attempt.should.be.json;
+         attempt.should.have.property("text").eql('{"message":"Email not valid"}')
+    })
+
+    it("Checking if the email is a string, has .com but no @", async() => {
+      const attempt = await chai.request(server)
+          .post('/register')
+          .send({
+            password:"jgjuhhiouyhgfvbhjkoG6#",
+            user_name:"",
+            first_name: "",
+            last_name: "",
+            re_password:"jgjuhhiouyhgfvbhjkoG6#",
+            email: "testexample.com",
+            picture:""})
+         attempt.should.have.status(500)
+         attempt.should.be.json;
+         attempt.should.have.property("text").eql('{"message":"Email not valid"}')
+    })
+
+  })
 
 
-// what happens if the user already exists 
+  
+  describe('/POST Register: Checking if user exists', async() => {
+    it("Checking if the email exists", async() => {
+      const attempt = await chai.request(server)
+          .post('/register')
+          .send({
+            password:"jgjuhhiouyhgfvbhjkoG6#",
+            user_name:"",
+            first_name: "",
+            last_name: "",
+            re_password:"jgjuhhiouyhgfvbhjkoG6#",
+            email: "test@gmail.com",
+            picture:""})
+         attempt.should.have.status(500)
+         attempt.should.be.json;
+         attempt.should.have.property("text").eql('{"message":"User already exists"}')
+    })
+  })
+
+  describe('/POST Register: Checking for successful registration', async() => {
+    it("Checking if the success is 201", async() => {
+      const attempt = await chai.request(server)
+          .post('/register')
+          .send({
+            password:"jgjuhhiouyhgfvbhjkoG6#",
+            user_name:"",
+            first_name: "",
+            last_name: "",
+            re_password:"jgjuhhiouyhgfvbhjkoG6#",
+            email: "test345@gmail.com",
+            picture:""})
+         attempt.should.have.status(201)
+         attempt.should.be.json;
+         attempt.should.have.property("text").eql('{"message":"success"}')
+    })
+  })
 
 
-// what happens if the email isn't an email address
-
-// what happens on a successful registration
+// // what happens on a successful registration
 
 
  

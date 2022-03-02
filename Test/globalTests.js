@@ -26,7 +26,12 @@ const testingTypes = async (cb,idealType,functionComment) => {
       }
   }
 
-  const checkUser = (user) => {
+  const mockUserRegistration = (user) => {
+    // create a new user registration
+      // get the id from the last created user and add that to 1000
+      // create a success user form 
+    // remove that user  registration instantly
+
   
   }
 

@@ -52,7 +52,7 @@ scanDB: async (table,filterID,filterProp) => {
   },
   putDB: async (table,item) => {
     
-    const res_obj = {total_users:[],status:false, message:""}
+    const res_obj = {total_items:[],status:false, message:""}
       if (getPrimitiveType(table) !== 'string') {
         res_obj["message"] = `PutDB's parameter Table name must be a string recieved a(n) ${getPrimitiveType(table)}`
         return res_obj

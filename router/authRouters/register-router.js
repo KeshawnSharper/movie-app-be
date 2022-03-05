@@ -1,4 +1,4 @@
-let {bcrypt,scanDB,checkGlobalUser} = require('../basicConfig.js/basicConfig')
+let {bcrypt,scanDB,checkGlobalUser,putDB} = require('../basicConfig.js/basicConfig')
 const express = require('express');
 const router = express.Router();
 console.log("hello from route-config")
@@ -21,7 +21,7 @@ router.post('/', async(req, res) => {
     }
     console.log(awsUsers.selected_items)
   
-    if (awsUsers. selected_items.length > 0){
+    if (awsUsers.selected_items.length > 0){
       res.status(500).json({"message":"User already exists"})
       return
     }

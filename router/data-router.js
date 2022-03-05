@@ -20,7 +20,6 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     secretAccessKey: AWS_SECRET,
     region: AWS_REGION_ID
 })
-console
 const globalFunctions = require('./globalFunctions')
 const {checkUser,checkAWSCreds,checkGlobalUser,getPrimitiveType} = globalFunctions
 
@@ -104,47 +103,7 @@ updateString = updateString.slice(0,-1)
   await dynamoDB.update({TableName: table,Key:{"id":id},UpdateExpression:updateString,ExpressionAttributeValues:UpdateExpressionObj}).promise()
 }
 console.log(AWS_REGION_ID,AWS_ACCESS,AWS_SECRET)
-router.post('/register', async(req, res) => {
-  let user = req.body
-  let message = "Couldn't Register User"
 
-  // try {
-  // console.log('data-router:100',req)
-  let checkedUser = checkUser(user)
-  if (checkedUser.status === false) {
-    res.status(500).json({"message":checkedUser.message})
-    return
-  }
-  let awsUsers = await scanDB("Movie-Application-users",user.email,"email")
-  console.log(awsUsers.selected_users)
-
-  if (awsUsers.status === false) {
-    res.status(500).json({"message":awsUsers.message})
-    return 
-  }
-  console.log(awsUsers.selected_users)
-
-  if (awsUsers.selected_users.length > 0){
-    res.status(500).json({"message":"User already exists"})
-    return
-  }
-  else{
-    let hash = bcrypt.hashSync(user.password,13)
-    user.password = hash 
-    user.re_password = hash
-    let users = awsUsers.total_users
-    user.id = `${users.length + 1}`
-    await putDB("Movie-Application-users",user)
-    res.status(201).json({"message":"success"})
-    return
-  }
-
-// }
-// catch (err) {
-  res.status(500).json({"message":message})
-  return
-// }
-})
 // router.get('/register', (req, res) => {
 // res.sendStatus(400)
 // })
@@ -173,57 +132,7 @@ let userFound = await scanDB("Movie-Application-users",user.email,"email")
  res.status(201).json(user)
 })
 // 
-router.post('/login', async(req, res) => {
-  try{
-  let user = req.body
-  if (getPrimitiveType(user.email) === 'string') {
-    user.email = user.email.toString().toLowerCase()
-  }
-  let checkedGlobalUser = checkGlobalUser(user,{"email":"string","password":"string"})
-  if (checkedGlobalUser.status === false) {
-    res.status(500).json({"message":checkedGlobalUser.message})
-    return
-  } 
-    
-let userFound
 
-if (storage.getItem(user.email) !== undefined){
-  userFound = JSON.parse(storage.getItem(user.email))
-}
-else{
-  userFound = await scanDB("Movie-Application-users",user.email,"email")
-  userFound = userFound.selected_users
- if (userFound.length === 0) {
-  res.status(500).json({"message":"User doesnt exist"})
-  return
- }
- userFound = userFound[0]
-}
-if (userFound && bcrypt.compareSync(user.password,userFound.password)){
-    let loggedIn = {
-    first_name: userFound.first_name,
-    id: userFound.id,
-    email: userFound.email,
-    picture: userFound.picture,
-    user_name: userFound.user_name,
-    last_name:userFound.last_name
-   }
-   storage.setItem(userFound.email, JSON.stringify(userFound))
-        const payload = {userid:loggedIn.id,username:loggedIn.user_name}
-        const options = {expiresIn:"1d"}
-        loggedIn.token = jwt.sign(payload,"secret",options)
-   res.status(201).json(loggedIn)
-   return
-}
- else{
-  res.status(500).json({message:`Invalid Credentials`})
-  return
- }
-}
-catch(err){
-  console.log(err)
-}
-});
 router.post('/saveMovie', async (req, res) => {
   let body = req.body
   let items = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
@@ -300,28 +209,6 @@ router.delete('/deleteMovie/:id/:user_id/:movie_id', async(req, res) => {
   res.status(200).json({"movies":movies,"id":id})
 })
 
-router.get('/users', (req, res) => {
-  data.getUsers()
-.then(data => {
-  res.status(200).json(data);
-})
-.catch(err => {
-  res.status(500).json({ message: 'Failed to get projects' });
-})
-})
-router.get('/users/:id', async (req, res) => {
-  let user = await scanDB("Movie-Application-users",req.params.id,"id")
- user  = user[0]
- delete user.password
-res.status(201).json({"user":user})
-})
-router.put('/users/:id', async (req, res) => {
- await editDB("Movie-Application-users",req.params.id,req.body)
- let user = await scanDB("Movie-Application-users",req.params.id,"id")
- user  = user[0]
- delete user.password
-res.status(201).json({"user":user})
-})
 
 router.post('/orders', (req, res) => {
   var today = new Date()

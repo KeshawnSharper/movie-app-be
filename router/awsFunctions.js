@@ -12,7 +12,8 @@ const globalFunctions = require('./globalFunctions')
 const {getPrimitiveType} = globalFunctions
 module.exports ={
 scanDB: async (table,filterID,filterProp) => {
-  const res_obj = {total_users:[], selected_users:[], status:false, message:""}
+  // console.log(table,filterID,filterProp)
+  const res_obj = {total_items:[], selected_items:[], status:false, message:""}
     if (getPrimitiveType(table) !== 'string') {
       res_obj["message"] = `ScanDB's parameter Table name must be a string recieved a(n) ${getPrimitiveType(table)}`
       return res_obj
@@ -33,8 +34,8 @@ scanDB: async (table,filterID,filterProp) => {
     else{
       items = []
     }
-    res_obj["total_users"] = total_users
-    res_obj["selected_users"] = items
+    res_obj["total_items"] = total_users
+    res_obj["selected_items"] = items
     res_obj["message"] = "success"
     res_obj["status"] = true
   })

@@ -1,20 +1,28 @@
 const express = require('express');
 
-const dataRouter = require('./router/data-router');
+
+const routes = require("./router/route-config")
 
 const cors = require('cors');
+let loginRouter = require('./router/authRouters/login-router')
+let registerRouter = require('./router/authRouters/register-router')
+let userRouter = require('./router/user-router')
 
 // server.use(helmet());
 // server.use(express.json());
 // server.use(cors());
 // server.use('/', dataRouter);
 function createServer() {
+  
     const helmet = require('helmet');
     const server = express();
     server.use(helmet());
     server.use(express.json());
     server.use(cors());
-    server.use('/', dataRouter);
+    server.use('/login',loginRouter);
+    server.use('/users',userRouter);
+    server.use('/register',registerRouter);
+    
     return server;
   }
 

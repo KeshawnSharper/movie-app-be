@@ -60,15 +60,18 @@ const checkUser = (user) => {
 
 const checkGlobalUser = (user,obj) => {
   let missingFields = returnMissingFields(user,Object.keys(obj))
+  console.log("missing fields runs", missingFields)
   if (missingFields.length > 0) {
       return {status:false,message:"Missing key properties"}
     }
+    console.log("line 67")
     if (user.email !== undefined) {
       let verifiedEmail = verifyEmail(user.email)
       if(verifiedEmail.status === false) {
         return verifiedEmail
       }
     }
+    // console.log("line 74")
     if (user.password !== undefined) {
       let checkedPassword = checkPassword(user)
 
@@ -76,13 +79,14 @@ const checkGlobalUser = (user,obj) => {
         return checkedPassword
       }
     }
-    
+    // console.log("line 74")
     for (const [key, value] of Object.entries(user)) {
       if (getPrimitiveType(value) !== obj[key]){
-        return {status:false,message:` ${key} must be a ${obj[key]}`}
+        return {status:false,message:`${key} must be a ${obj[key]}`}
      }
     
   }
+  // console.log("line 74")
   return {status:true}
 }
 

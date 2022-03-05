@@ -5,60 +5,60 @@ const { assert } = require('chai');
 let should = chai.should();
 chai.use(chaiHttp);
 
-// const globalTests = require("./router/Tests/globalTests")
+// // const globalTests = require("./router/Tests/globalTests")
 
-// create a unexisted properties string
-// create a wrong types string
-// has to check for property
-  // if property doesn't exist return a 
-  // if property exist has to check if property type matches 
-    // if property type doesn't match add it to the wrong types array
-// if wrong props or unexisted properties exist return a string with a message defining the errors
+// // // create a unexisted properties string
+// // // create a wrong types string
+// // // has to check for property
+// //   // if property doesn't exist return a 
+// //   // if property exist has to check if property type matches 
+// //     // if property type doesn't match add it to the wrong types array
+// // // if wrong props or unexisted properties exist return a string with a message defining the errors
 
-// if user doesn't exists return 500 status with "user does'nt exists"
-// if user exists but the password is wrong return 500 error and "password is wrong"
-// if email isn't in email format return 500 error and "email does'nt exists"
- //if password isnt a string return 500 error and "password is wrong"
+// // // if user doesn't exists return 500 status with "user does'nt exists"
+// // // if user exists but the password is wrong return 500 error and "password is wrong"
+// // // if email isn't in email format return 500 error and "email does'nt exists"
+// //  //if password isnt a string return 500 error and "password is wrong"
 
 const server = createServer()
 
-describe('/Login 404  error paths', () => {
-    it('GET Login', (done) => {
-      chai.request(server)
-          .get('/login')
-          .end((err, res) => {
-                res.should.have.status(404)
-            done();
-          });
-    })
+// describe('/Login 404  error paths', () => {
+//     it('GET Login', (done) => {
+//       chai.request(server)
+//           .get('/login')
+//           .end((err, res) => {
+//                 res.should.have.status(404)
+//             done();
+//           });
+//     })
   
-    it('PUT Login', (done) => {
-      chai.request(server)
-          .put('/login')
-          .end((err, res) => {
-                res.should.have.status(404)
-            done();
-          });
-    })
+//     it('PUT Login', (done) => {
+//       chai.request(server)
+//           .put('/login')
+//           .end((err, res) => {
+//                 res.should.have.status(404)
+//             done();
+//           });
+//     })
   
-    it('DELETE Login', (done) => {
-      chai.request(server)
-          .delete('/login')
-          .end((err, res) => {
-                res.should.have.status(404)
-            done();
-          });
-    })
+//     it('DELETE Login', (done) => {
+//       chai.request(server)
+//           .delete('/login')
+//           .end((err, res) => {
+//                 res.should.have.status(404)
+//             done();
+//           });
+//     })
   
-    it('PATCH Login', (done) => {
-      chai.request(server)
-          .patch('/login')
-          .end((err, res) => {
-                res.should.have.status(404)
-            done();
-          });
-    })
-  });
+//     it('PATCH Login', (done) => {
+//       chai.request(server)
+//           .patch('/login')
+//           .end((err, res) => {
+//                 res.should.have.status(404)
+//             done();
+//           });
+//     })
+//   });
 
   describe('/POST Login: Checking for required fields', () => {
     it('testing if empty body request sends an error', async() => {

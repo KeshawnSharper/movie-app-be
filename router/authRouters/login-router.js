@@ -1,22 +1,17 @@
 let {
-    express,
-    router,
+ 
     bcrypt,
     jwt,
-    multer,
-    axios,
-    v4,
-    nodemailer,
     scanDB,
-    storage,
-    response,
-    AWS_ACCESS, AWS_SECRET,AWS_REGION_ID,
-    checkUser, checkAWSCreds, checkGlobalUser,getPrimitiveType
+    storage,checkGlobalUser,getPrimitiveType
 } 
 = require('../basicConfig.js/basicConfig')
+const express = require('express');
+const router = express.Router();
 
 
 router.post(`/`, async(req, res) => {
+  console.log("login")
     try{
     let user = req.body
     if (getPrimitiveType(user.email) === 'string') {
@@ -64,7 +59,6 @@ router.post(`/`, async(req, res) => {
    }
   }
   catch(err){
-    console.log(err)
   }
   });
 

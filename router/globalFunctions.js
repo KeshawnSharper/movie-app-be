@@ -11,6 +11,7 @@ const getPrimitiveType = (value) => {
 }
 const returnMissingFields = (obj,arr) => {
 let res = []
+// console.log(obj,arr)
 for (let i = 0; i < arr.length; i++){
   if (arr[i] in obj === false){
     res.push(arr[i])
@@ -60,11 +61,10 @@ const checkUser = (user) => {
 
 const checkGlobalUser = (user,obj) => {
   let missingFields = returnMissingFields(user,Object.keys(obj))
-  console.log("missing fields runs", missingFields)
+  console.log(missingFields)
   if (missingFields.length > 0) {
       return {status:false,message:"Missing key properties"}
     }
-    console.log("line 67")
     if (user.email !== undefined) {
       let verifiedEmail = verifyEmail(user.email)
       if(verifiedEmail.status === false) {
@@ -81,7 +81,12 @@ const checkGlobalUser = (user,obj) => {
     }
     // console.log("line 74")
     for (const [key, value] of Object.entries(user)) {
-      if (getPrimitiveType(value) !== obj[key]){
+      let primitiveType = getPrimitiveType(value)
+      if (obj[key] === undefined){
+        console.log(obj[key])
+        continue
+      }
+      if (primitiveType !== obj[key]){
         return {status:false,message:`${key} must be a ${obj[key]}`}
      }
     
@@ -145,6 +150,7 @@ checkAWSCreds = ({AWS_ACCESS, AWS_SECRET,AWS_REGION_ID}) => {
   return {status:true,message:"Valid Credentials"}
 
 }
+
 
 
 module.exports = {checkAWSCreds:checkAWSCreds,getPrimitiveType:getPrimitiveType,checkUser:checkUser,checkGlobalUser:checkGlobalUser}

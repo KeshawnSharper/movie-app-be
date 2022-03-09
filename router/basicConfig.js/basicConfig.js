@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const axios = require("axios")
 const nodemailer = require('nodemailer');
-const {scanDB,putDB} = require('../awsFunctions')
+const {scanDB,putDB,deleteDB} = require('../awsFunctions')
 const storage = require('node-sessionstorage')
 // router.use(bodyParser.json());
 const AWS = require("aws-sdk");
@@ -30,6 +30,7 @@ module.exports = {
     nodemailer,
     scanDB,
     putDB,
+    deleteDB,
     storage,
     response,
     AWS_ACCESS, AWS_SECRET,AWS_REGION_ID,

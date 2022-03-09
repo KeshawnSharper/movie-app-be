@@ -12,14 +12,16 @@ const globalFunctions = require('./globalFunctions')
 const {getPrimitiveType} = globalFunctions
 module.exports ={
 scanDB: async (table,filterID,filterProp) => {
-  // console.log(table,filterID,filterProp)
   const res_obj = {total_items:[], selected_items:[], status:false, message:""}
     if (getPrimitiveType(table) !== 'string') {
+      console.log("17")
+
       res_obj["message"] = `ScanDB's parameter Table name must be a string recieved a(n) ${getPrimitiveType(table)}`
       return res_obj
     }
     if (typeof filterProp !== "string" && filterID !== undefined) {
       res_obj["message"] = `ScanDB's parameter filterProp must be a string recieved a(n) ${getPrimitiveType(filterProp)}`
+      console.log("24")
       return res_obj
     }
     
@@ -27,14 +29,15 @@ scanDB: async (table,filterID,filterProp) => {
     .then(res => {
     let items = res
     items = items["Items"]
-    let total_users = items
+    let total_items = items
+    
     if (filterID !== null){
       items = items.filter(item => item[`${filterProp}`] === filterID)
     }
     else{
       items = []
     }
-    res_obj["total_items"] = total_users
+    res_obj["total_items"] = total_items
     res_obj["selected_items"] = items
     res_obj["message"] = "success"
     res_obj["status"] = true
@@ -78,5 +81,20 @@ scanDB: async (table,filterID,filterProp) => {
       return res_obj
   
       
+    },
+    deleteDB : async (table,id) => {
+      const res_obj = {status:false, message:""}
+      await dynamoDB.delete({TableName: table,Key:{id:`${id}`}}).promise()
+      .then(res => {
+        let items = res
+        res_obj["message"] = "success"
+        res_obj["status"] = true
+        console.log("working")
+      })
+      .catch(err => {
+        res_obj["message"] = err.code
+      })
+    
+    return res_obj
     }
 }

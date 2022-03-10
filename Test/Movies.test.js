@@ -244,6 +244,7 @@ describe('/POST savedMovies ', () => {
           "title": "Encanto"
       })
         attempt.should.have.status(201)
+        
     })
     it('UNCOMMENT: testing if movie already exist', async() => {
       const attempt = await chai.request(server)

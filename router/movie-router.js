@@ -52,7 +52,7 @@ router.get('/:id', async(req, res) => {
       res.status(500).json({"message":savedAWSMovies.message})
       return 
     }  
-     res.status(200).json(savedAWSMovies.selected_items)
+     res.status(200).json({"movies":savedAWSMovies.selected_items})
      return
   // }
   })
@@ -71,11 +71,11 @@ router.get('/:id', async(req, res) => {
         return 
       }
       const selectedMovie = selectedAWSMovies.selected_items[0]
-      console.log(selectedMovie)
-      console.log(await deleteDB("Movie-Application-fav-movies",req.params.id,"id"))
+      console.log(selectedMovie.userID)
+      await deleteDB("Movie-Application-fav-movies",req.params.id,"id")
       let movies = await scanDB("Movie-Application-fav-movies",selectedMovie.userID,"userID")
 
-       res.status(200).json({movies:movies,id:req.params.id})
+       res.status(200).json({movies:movies.selected_items})
        return
     // }
     })
@@ -123,7 +123,7 @@ router.get('/:id', async(req, res) => {
     await putDB("Movie-Application-fav-movies",body)
     // let recommendations = await addRecommendations(body)
     let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-    res.status(201).json({movies:movies})
+    res.status(201).json({movies:movies.selected_items})
     
   }
   })

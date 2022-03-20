@@ -40,7 +40,9 @@ router.get('/:id', async(req, res) => {
       return
     } 
     userFound = await scanDB("Movie-Application-users",req.params.id,"id")
+    console.log(userFound)
     userFound = userFound.selected_items
+    console.log(userFound)
    if (userFound.length === 0) {
     res.status(500).json({"message":"User doesnt exist"})
     return
@@ -81,6 +83,7 @@ router.get('/:id', async(req, res) => {
     })
   router.post('/', async (req, res) => {
     let body = req.body
+    console.log()
     let checkedGlobalUser = checkGlobalUser(body,{"movie_id":"string","userID":"string","original_title":"string","genre_ids":"array","adult":"boolean","overview":"string","vote_average":"number","vote_count":"number","poster_path":"string","original_language":"string","backdrop_path":"string","release_date":"string","title":"string","video":"boolean"})
     if (checkedGlobalUser.status === false) {
       res.status(500).json({"message":checkedGlobalUser.message})

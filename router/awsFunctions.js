@@ -6,7 +6,7 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     secretAccessKey: AWS_SECRET,
     region: AWS_REGION_ID
 })
-
+console.log("accessKey",process.env.AWS_ACCESS,process.env.AWS_SECRET)
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 const globalFunctions = require('./globalFunctions')
 const {getPrimitiveType} = globalFunctions

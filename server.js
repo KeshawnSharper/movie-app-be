@@ -17,12 +17,10 @@ function createServer() {
   
     const helmet = require('helmet');
     const server = express();
-    server.use(cors({
-      origin: 'http://localhost:3000',
-      methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
-  }));
+    server.use(cors());
     server.use(helmet());
     server.use(express.json());
+    server.set({'Access-Control-Allow-Origin': '*'})
     server.use('/login',loginRouter);
     server.use('/users',userRouter);
     server.use('/register',registerRouter);

@@ -13,12 +13,13 @@ let movieRouter = require('./router/movie-router')
 // server.use(cors());
 // server.use('/', dataRouter);
 function createServer() {
+ 
   
     const helmet = require('helmet');
     const server = express();
+    server.use(cors());
     server.use(helmet());
     server.use(express.json());
-    server.use(cors());
     server.use('/login',loginRouter);
     server.use('/users',userRouter);
     server.use('/register',registerRouter);

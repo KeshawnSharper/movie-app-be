@@ -18,7 +18,7 @@ function createServer() {
     const helmet = require('helmet');
     const server = express();
     server.use(cors({
-      origin: '*',
+      origin: 'http://localhost:3000',
       methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
   }));
     server.use(helmet());

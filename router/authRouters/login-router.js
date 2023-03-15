@@ -38,22 +38,17 @@ router.post(`/`, async(req, res) => {
    userFound = userFound[0]
   }
   if (userFound && bcrypt.compareSync(user.password,userFound.password)){
-      let loggedIn = {
-      first_name: userFound.first_name,
-      id: userFound.id,
-      email: userFound.email,
-      picture: userFound.picture,
-      user_name: userFound.user_name,
-      last_name:userFound.last_name
-     }
+      let loggedIn = userFound
+     console.log("userFound",userFound)
      storage.setItem(userFound.email, JSON.stringify(userFound))
           const payload = {userid:loggedIn.id,username:loggedIn.user_name}
           const options = {expiresIn:"1d"}
-          loggedIn.token = jwt.sign(payload,"secret",options)
-     res.status(201).json(loggedIn)
+          const token = jwt.sign(payload,"secret",options)
+     res.status(201).json({"user":loggedIn,"token":token})
      return
   }
    else{
+    console.log("userfound",userFound)
     res.status(500).json({message:`Invalid Credentials`})
     return
    }

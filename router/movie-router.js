@@ -5,6 +5,7 @@ const axios  = require('axios');
 let addRecommendations = async(movie) => {
     let obj = {}
     let userMovies = await scanDB("Movie-Application_recommended_movies",movie.userID,"userID")
+    console.log("userMovies:",userMovies)
     userMovies.map(item => obj[item.id] = true)
     console.log(obj)
     axios.get(`https://api.themoviedb.org/3/movie/${movie.movie_id}/recommendations?api_key=bab5bd152949b76eccda9216965fc0f1&language=en-US&page=1`).then(async(res) => {
@@ -22,7 +23,6 @@ let addRecommendations = async(movie) => {
         runtime: result.runtime
     }
     if (obj[movie.id] !== true){
-      console.log("bye")
       putDB("Movie-Application_recommended_movies", new_movie)
     }
     else{
@@ -125,6 +125,7 @@ router.get('/:id', async(req, res) => {
     
     await putDB("Movie-Application-fav-movies",body)
     // let recommendations = await addRecommendations(body)
+    console.log("body",body)
     let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
     res.status(201).json({movies:movies.selected_items})
     

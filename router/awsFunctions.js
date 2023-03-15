@@ -60,18 +60,20 @@ scanDB: async (table,filterID,filterProp) => {
         res_obj["message"] = `PutDB's parameter Table name must be a string recieved a(n) ${getPrimitiveType(table)}`
         return res_obj
       }
+      console.log("item",item)
       if (typeof item !== "object") {
         res_obj["message"] = `PutDB's parameter item must be an object recieved a(n) ${getPrimitiveType(filterProp)}`
         return res_obj
       }
-      
+      console.log("aws",item)
       await dynamoDB.put({TableName: table,Item:item}).promise()
       .then(res => {
-      let items = res
+
       res_obj["message"] = "success"
       res_obj["status"] = true
     })
     .catch(err => {
+      console.log(`error:${err}`)
       res_obj["message"] = err.code
     }
       )

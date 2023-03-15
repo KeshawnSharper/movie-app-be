@@ -6,8 +6,9 @@ router.post('/', async(req, res) => {
 
     let user = req.body
     let message = "Couldn't Register User"
+    console.log(user)
   
-    // try {
+    try {
     let checkedGlobalUser = checkGlobalUser(user,{"email":"string","password":"string","re_password":"string","picture":"string", "first_name": "string","user_name":"string","last_name": "string",})
     if (checkedGlobalUser.status === false) {
       res.status(500).json({"message":checkedGlobalUser.message})
@@ -36,10 +37,10 @@ router.post('/', async(req, res) => {
       return
     }
   
-  // }
-  // catch (err) {
+  }
+   catch (err) {
     res.status(500).json({"message":message})
     return
-  // }
+   }
   })
   module.exports = router ;

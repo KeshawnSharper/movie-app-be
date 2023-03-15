@@ -1,5 +1,5 @@
  let {
-    scanDB,
+    scanDB,putDB
 }
 = require('./basicConfig.js/basicConfig')
 
@@ -17,14 +17,15 @@ router.get('/:id', async (req, res) => {
     }
     let user = await scanDB("Movie-Application-users",req.params.id,"id")
    user = user.selected_items[0]
-   delete user.password
-   delete user.re_password
   res.status(200).json(user)
   })
  router.put('/:id', async (req, res) => {
-   await editDB("Movie-Application-users",req.params.id,req.body)
+  console.log("id",req.params.id)
+  req.body.id = req.params.id
+   await putDB("Movie-Application-users",req.body)
    let user = await scanDB("Movie-Application-users",req.params.id,"id")
-   user  = user[0]
+   user  = user.selected_items[0]
+   console.log("user",user)
   //  delete user.password
   res.status(201).json({"user":user})
   })

@@ -19,6 +19,10 @@ function createServer() {
     const server = express();
     server.use(helmet());
     server.use(express.json());
+    server.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*');
+      next();
+    });
     server.set({'Access-Control-Allow-Origin': '*'})
     server.use(cors());
 

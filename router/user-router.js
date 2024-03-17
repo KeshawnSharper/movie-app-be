@@ -27,7 +27,7 @@ router.get('/:id', async (req, res) => {
    user  = user.selected_items[0]
    console.log("user",user)
   //  delete user.password
-  res.status(201).json({"user":user})
+  res.status(200).json({"user":user})
   })
 
   module.exports = router;

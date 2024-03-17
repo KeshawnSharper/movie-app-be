@@ -100,7 +100,7 @@ let deleteDB = async (table,id) => {
 //       const payload = {userid:req.params.id,username:req.body.profileObj.name}
 //       const options = {expiresIn:"1d"}
 //       user.token = jwt.sign(payload,"secret",options)
-//  res.status(201).json(user)
+//  res.status(200).json(user)
 // })
 // // 
 
@@ -120,7 +120,7 @@ let deleteDB = async (table,id) => {
 //   await putDB("Movie-Application-fav-movies",body)
 //   let recommendations = await addRecommendations(body)
 //   let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-//   res.status(201).json({movies:movies,recommendations:recommendations})
+//   res.status(200).json({movies:movies,recommendations:recommendations})
 //   }
 //   else{
 //     res.status(500).json("Movie already exsists")
@@ -187,7 +187,7 @@ router.delete('/deleteMovie/:id/:user_id/:movie_id', async(req, res) => {
 //   console.log('req.body',req.body)
 //   data.purchase(req.body)
 //   .then(project => {
-//     res.status(201).json(project)
+//     res.status(200).json(project)
 //   })
 //   .catch(err => {
 //     res.status(500).json({ message: err });

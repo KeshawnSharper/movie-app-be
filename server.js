@@ -25,7 +25,6 @@ function createServer() {
     });
     server.set({'Access-Control-Allow-Origin': '*'})
     server.use(cors());
-
     server.use('/login',loginRouter);
     server.use('/users',userRouter);
     server.use('/register',registerRouter);

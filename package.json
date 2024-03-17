@@ -8,7 +8,7 @@
     "test": "mocha --timeout 10000"
   },
   "repository": {
-    "type": "git",
+    "type": "commonjs",
     "url": "git+https://github.com/KeshawnSharper/movie-app-be.git"
   },
   "author": "",
@@ -19,7 +19,9 @@
   "homepage": "https://github.com/KeshawnSharper/movie-app-be#readme",
   "description": "",
   "dependencies": {
-    "aws-sdk": "^2.1001.0",
+    "@aws-sdk/client-dynamodb": "^3.535.0",
+    "@aws-sdk/lib-dynamodb": "^3.535.0",
+    "aws-sdk": "^2.1579.0",
     "axios": "^0.23.0",
     "bcryptjs": "^2.4.3",
     "chai": "^4.3.6",
@@ -38,6 +40,7 @@
     "nodemailer": "^6.4.17",
     "nodemon": "^2.0.6",
     "request": "^2.88.2",
+    "serverless-http": "^3.2.0",
     "supertest": "^6.2.2",
     "uuid": "^8.3.2"
   }

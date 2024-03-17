@@ -13,6 +13,7 @@ const router = express.Router();
 router.post(`/`, async(req, res) => {
   console.log("login")
   res.set('Access-Control-Allow-Origin', '*');
+  console.log(req.body)
     try{
     let user = req.body
     if (getPrimitiveType(user.email) === 'string') {
@@ -45,7 +46,7 @@ router.post(`/`, async(req, res) => {
           const payload = {userid:loggedIn.id,username:loggedIn.user_name}
           const options = {expiresIn:"1d"}
           const token = jwt.sign(payload,"secret",options)
-     res.status(201).json({"user":loggedIn,"token":token})
+     res.status(200).json({"user":loggedIn,"token":token})
      return
   }
    else{

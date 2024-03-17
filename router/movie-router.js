@@ -127,7 +127,7 @@ router.get('/:id', async(req, res) => {
     // let recommendations = await addRecommendations(body)
     console.log("body",body)
     let movies = await scanDB("Movie-Application-fav-movies",body.userID,"userID")
-    res.status(201).json({movies:movies.selected_items})
+    res.status(200).json({movies:movies.selected_items})
     
   }
   })

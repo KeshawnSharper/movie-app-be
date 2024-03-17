@@ -33,7 +33,7 @@ router.post('/', async(req, res) => {
       let users = awsUsers.total_items
       user.id = `${users.length + 1}`
       await putDB("Movie-Application-users",user)
-      res.status(201).json({"message":"success"})
+      res.status(200).json({"message":"success"})
       return
     }
   

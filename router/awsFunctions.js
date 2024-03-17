@@ -7,7 +7,7 @@ const { AWS_ACCESS, AWS_SECRET,AWS_REGION_ID} =
     secretAccessKey: AWS_SECRET,
     region: AWS_REGION_ID
 })
-console.log("accessKey",process.env.AWS_ACCESS,process.env.AWS_SECRET)
+console.log("accessKey",process.env.AWS_ACCESS,"secretkey",process.env.AWS_SECRET,"region",AWS_REGION_ID)
 const dynamoDB = new AWS.DynamoDB.DocumentClient()
 const globalFunctions = require('./globalFunctions');
 const { response } = require("express");

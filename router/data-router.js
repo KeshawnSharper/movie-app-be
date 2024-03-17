@@ -57,10 +57,10 @@
 // // }
 // let putDB = async (table,item) => {
 //   await scanDB(table,item,"recommended_movie_id")
-//   await dynamoDB.put({TableName: table,Item:item}).promise()
+//   await dynamoDB.put({TableName: table,Item:item})
 // }
 let deleteDB = async (table,id) => {
-  await dynamoDB.delete({TableName: table,Key:{id:`${id}`}}).promise()
+  await dynamoDB.delete({TableName: table,Key:{id:`${id}`}})
 }
 // let editDB = async (table,id,body) => {
 // console.log(body)

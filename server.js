@@ -9,7 +9,7 @@ let registerRouter = require('./router/authRouters/register-router')
 let userRouter = require('./router/user-router')
 let movieRouter = require('./router/movie-router')
 // server.use(helmet());
-// server.use(express.json());
+// server.use(express.json())
 // server.use(cors());
 // server.use('/', dataRouter);
 function createServer() {

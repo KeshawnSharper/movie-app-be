@@ -29,7 +29,7 @@ function createServer() {
     //   res.header("Access-Control-Allow-Methods", "POST, GET, PUT");
     //   next();
     // });
-    // server.set({'Access-Control-Allow-Origin': '*'})
+    server.set({'Access-Control-Allow-Origin': '*'})
     server.use('/login',loginRouter);
     server.use('/users',userRouter);
     server.use('/register',registerRouter);

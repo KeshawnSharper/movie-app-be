@@ -24,12 +24,12 @@ function createServer() {
     const server = express();
     server.use(helmet());
     server.use(express.json());
-    server.use((req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*');
-      res.header("Access-Control-Allow-Methods", "POST, GET, PUT");
-      next();
-    });
-    server.set({'Access-Control-Allow-Origin': '*'})
+    // server.use((req, res, next) => {
+    //   res.header('Access-Control-Allow-Origin', '*');
+    //   res.header("Access-Control-Allow-Methods", "POST, GET, PUT");
+    //   next();
+    // });
+    // server.set({'Access-Control-Allow-Origin': '*'})
     server.use(cors(corsOptions));
     server.use('/login',loginRouter);
     server.use('/users',userRouter);

@@ -4,11 +4,10 @@ require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 // const routes = require("./router/route-config")
 
 const cors = require('cors');
-const corsOptions ={
-  origin:'*', 
-  credentials:true,            //access-control-allow-credentials:true
-  optionSuccessStatus:200,
-}
+const corsOptions = {
+  credentials: true,
+  origin: ['http://localhost:3000', 'http://localhost:80'] // Whitelist the domains you want to allow
+};
 let loginRouter = require('./router/authRouters/login-router')
 let registerRouter = require('./router/authRouters/register-router')
 let userRouter = require('./router/user-router')
@@ -19,9 +18,10 @@ let movieRouter = require('./router/movie-router')
 // server.use('/', dataRouter);
 function createServer() {
  
-  
+
     const helmet = require('helmet')
     const server = express();
+    server.use(cors(corsOptions));
     server.use(helmet());
     server.use(express.json());
     // server.use((req, res, next) => {
@@ -30,7 +30,6 @@ function createServer() {
     //   next();
     // });
     // server.set({'Access-Control-Allow-Origin': '*'})
-    server.use(cors(corsOptions));
     server.use('/login',loginRouter);
     server.use('/users',userRouter);
     server.use('/register',registerRouter);

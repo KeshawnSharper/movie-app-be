@@ -26,7 +26,7 @@ function createServer() {
     server.use(express.json());
     server.use(function(req, res, next) {
       // res.header("Access-Control-Allow-Origin", "*");
-      const allowedOrigins = ['http://localhost:3000', 'https://movie-application-bxf3.vercel.app', 'https://gamebrag.onrender.com'];
+      const allowedOrigins = ['http://localhost:3000', 'https://movie-application-blond.vercel.app/', 'https://gamebrag.onrender.com'];
       const origin = req.headers.origin;
       if (allowedOrigins.includes(origin)) {
            res.setHeader('Access-Control-Allow-Origin', origin);

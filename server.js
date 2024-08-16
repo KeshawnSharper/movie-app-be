@@ -24,9 +24,9 @@ function createServer() {
     server.use(cors(corsOptions));
     server.use(helmet());
     server.use(express.json());
-    app.use(function(req, res, next) {
+    server.use(function(req, res, next) {
       // res.header("Access-Control-Allow-Origin", "*");
-      const allowedOrigins = ['http://localhost:3000', 'https://movie-application-bxf3.vercel.app/', 'https://gamebrag.onrender.com'];
+      const allowedOrigins = ['http://localhost:3000', 'https://movie-application-bxf3.vercel.app', 'https://gamebrag.onrender.com'];
       const origin = req.headers.origin;
       if (allowedOrigins.includes(origin)) {
            res.setHeader('Access-Control-Allow-Origin', origin);

@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post(`/`, async(req, res) => {
   console.log("login")
-  res.set('Access-Control-Allow-Origin', '*');
+  // res.set('Access-Control-Allow-Origin', '*');
   console.log(req.body)
     try{
     let user = req.body
